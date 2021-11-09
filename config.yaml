@@ -1,6 +1,6 @@
 # Dataset settings
-dataset: 'IndianPines'  # PaviaU; IndianPines; Salinas
-experiment: 'indian_pines_02'  # Name for the experiment (will be used to load all information)
+dataset: 'PaviaU'  # PaviaU; IndianPines; Salinas
+experiment: 'prototype_01'  # Name for the experiment (will be used to load all information)
 data_folder: './datasets/'  # Dataset folder
 exec_folder: './experiments/'  # Folder where to keep all the experiment data
 split_folder: 'data_split/'  # Where to store dataset splits
