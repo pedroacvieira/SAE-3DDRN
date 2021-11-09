@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Oct 8 17:47 2021
+Created on Tue Nov 9 17:46 2021
 
 @author: Pedro Vieira
 @description: Implements dataset function to provide the data during training
@@ -13,11 +13,11 @@ import numpy as np
 
 
 # Dataset class based on PyTorch's
-class DFFNDataset(Dataset):
+class SAE3DDataset(Dataset):
     """Dataset class based on PyTorch's"""
 
     def __init__(self, data, gt, sample_size=23, data_augmentation=True):
-        super(DFFNDataset, self).__init__()
+        super(SAE3DDataset, self).__init__()
         self.sample_size = sample_size
         self.data_augmentation = data_augmentation
 

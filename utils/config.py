@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Oct 07 19:02 2021
+Created on Tue Nov 09 17:44 2021
 
-@author: Pedro Vieira @description: Settings for the DFFN training and testing
+@author: Pedro Vieira
+@description: Settings for the SAE-3DDRN training and testing
 """
 
 import shutil
@@ -11,7 +12,7 @@ import os
 import yaml
 
 
-class DFFNConfig:
+class SAE3DConfig:
     def __init__(self, filename='config.yaml', test=False):
         # Load config
         with open(filename, "r") as file:

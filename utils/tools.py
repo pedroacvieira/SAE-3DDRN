@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Sep 29 14:29 2021
+Created on Tue Nov 09 17:50 2021
 
 @author: Pedro Vieira
 @description: Implements util functions to be used during train and/or test
@@ -21,7 +21,7 @@ import glob
 class HSIData:
     """Stores dataset raw image and labels and applies pre-processing"""
 
-    def __init__(self, dataset_name, target_folder='./datasets/', num_bands=5):
+    def __init__(self, dataset_name, target_folder='./datasets/'):
         self.dataset_name = dataset_name
         folder = target_folder + dataset_name + '/'
 
@@ -36,7 +36,7 @@ class HSIData:
                                  "Soybean-notill", "Soybean-mintill", "Soybean-clean",
                                  "Wheat", "Woods", "Buildings-Grass-Trees-Drives",
                                  "Stone-Steel-Towers"]
-            self.rgb_bands = (43, 21, 11)  # AVIRIS sensor
+            self.rgb_bands = (43, 21, 11)
         elif dataset_name == 'PaviaU':
             img = io.loadmat(folder + 'PaviaU.mat')['paviaU']
             gt = io.loadmat(folder + 'PaviaU_gt.mat')['paviaU_gt']
@@ -69,33 +69,20 @@ class HSIData:
         self.ignored_labels = list(set(ignored_labels))
         self.num_classes = len(self.label_values) - len(self.ignored_labels)
 
-        img = np.asarray(img, dtype='float32')
-        self.image, self.pca, _, _ = self.apply_dimension_reduction(img, num_bands)
+        self.image = self.normalize(np.asarray(img, dtype='float32'))
 
     @staticmethod
-    def apply_dimension_reduction(image, num_bands=5):
-        assert num_bands < image.shape[2], 'The amount of bands should be smaller than the number image channels'
+    def normalize(image):
         image_height, image_width, image_bands = image.shape
         flat_image = np.reshape(image, (image_height * image_width, image_bands))
 
         # Normalize data before applying PCA. Range [-1, 1]
-        sca1 = StandardScaler()
-        sca1.fit(flat_image)
-        norm1_img = sca1.transform(flat_image)
+        sca = StandardScaler()
+        sca.fit(flat_image)
+        norm_img = sca.transform(flat_image)
 
-        # Apply PCA to reduce the number of bands to num_bands
-        pca = PCA(int(num_bands))
-        pca.fit(norm1_img)
-        pca_img = pca.transform(norm1_img)
-
-        # Normalize data after applying PCA. Range [-1, 1] (Is it really necessary?)
-        sca2 = StandardScaler()
-        sca2.fit(pca_img)
-        norm2_img = sca2.transform(pca_img)
-
-        out_img = np.reshape(norm2_img, (image_height, image_width, num_bands))
-
-        return out_img, pca, sca1, sca2  # Returning transformers for future usage
+        out_img = np.reshape(norm_img, (image_height, image_width, image_bands))
+        return out_img
 
     # Split ground-truth pixels into train, test, val
     def sample_dataset(self, train_size=0.8, val_size=0.1, max_train_samples=None):

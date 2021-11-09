@@ -3,7 +3,8 @@
 """
 Created on Mon Oct 18 11:36 2021
 
-@author: Pedro Vieira @description: Implements a function to get the model from a checkpoint dictionary
+@author: Pedro Vieira
+@description: Implements a function to get the model from a checkpoint dictionary
 """
 
 import torch
