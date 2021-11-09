@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Oct 5 17:57 2021
+Created on Tue Nov 9 17:57 2021
 
 @author: Pedro Vieira
-@description: Implements the test function for the DFFN network published in https://github.com/weiweisong415/Demo_DFFN_for_TGRS2018
+@description: Implements the test function for the SAE-3DDRN network
 """
 
 import torch
@@ -31,7 +31,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 CONFIG_FILE = ''  # Empty string to load default 'config.yaml'
 
 
-# Test DFFN runs
+# Test SAE-3DDRN runs
 def test():
     # Load config data from training
     config_file = 'config.yaml' if not CONFIG_FILE else CONFIG_FILE
@@ -61,8 +61,8 @@ def test():
         num_classes = len(np.unique(test_gt)) - 1
 
         # Load model
-        model_file = cfg.exec_folder + f'runs/dffn_{test_best}model_run_' + str(run) + '.pth'
-        model = nn.DataParallel(DFFN(cfg.sample_bands, num_classes))
+        model_file = cfg.exec_folder + f'runs/sae3d_{test_best}model_run_' + str(run) + '.pth'
+        model = nn.DataParallel(SAE3D(cfg.sample_bands, num_classes))
         model.load_state_dict(torch.load(model_file))
         model.eval()
 
