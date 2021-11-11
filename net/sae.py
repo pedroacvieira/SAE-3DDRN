@@ -7,7 +7,6 @@ Created on Tue Nov 11 15:37 2021
 @description: Implements network architecture of the stacked autoencoder for the SAE-3DDRN
 """
 
-import torch
 import torch.nn as nn
 
 
