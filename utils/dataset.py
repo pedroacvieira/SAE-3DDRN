@@ -12,12 +12,12 @@ from torch.utils.data import Dataset
 import numpy as np
 
 
-# Dataset class based on PyTorch's
-class SAE3DDataset(Dataset):
-    """Dataset class based on PyTorch's"""
+# Dataset class for the 3DDRN network
+class DRNDataset(Dataset):
+    """Dataset class for the 3DDRN based on PyTorch's"""
 
     def __init__(self, data, gt, sample_size=23, data_augmentation=True):
-        super(SAE3DDataset, self).__init__()
+        super(DRNDataset, self).__init__()
         self.sample_size = sample_size
         self.data_augmentation = data_augmentation
 
@@ -76,4 +76,29 @@ class SAE3DDataset(Dataset):
         elif p2 < 0.75:
             data = np.rot90(data, 3)
 
+        return data
+
+
+# Dataset class for the SAE network
+class SAEDataset(Dataset):
+    """Dataset class for the SAE based on PyTorch's"""
+
+    def __init__(self, data):
+        super(SAEDataset, self).__init__()
+
+        self.data = data
+
+        height_idx = list(range(data.shape[0]))
+        width_idx = list(range(data.shape[1]))
+        self.indices = [(x, y) for x in height_idx for y in width_idx]
+
+    def __len__(self):
+        return len(self.indices)
+
+    def __getitem__(self, i):
+        x, y = self.indices[i]
+        data = self.data[x, y]
+
+        # Load the data into PyTorch tensor
+        data = torch.from_numpy(data)
         return data
