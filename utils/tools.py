@@ -76,10 +76,11 @@ class HSIData:
         image_height, image_width, image_bands = image.shape
         flat_image = np.reshape(image, (image_height * image_width, image_bands))
 
-        # Normalize data before applying PCA. Range [-1, 1]
+        # Normalize data. Range [-1, 1]
         sca = StandardScaler()
         sca.fit(flat_image)
         norm_img = sca.transform(flat_image)
+        norm_img = (norm_img + 1) / 2  # Set range from [-1, 1] to [0, 1]
 
         out_img = np.reshape(norm_img, (image_height, image_width, image_bands))
         return out_img
