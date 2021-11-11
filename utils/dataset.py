@@ -79,6 +79,7 @@ class DRNDataset(Dataset):
         return data
 
 
+# TODO: Fix dataset to not use the whole dataset
 # Dataset class for the SAE network
 class SAEDataset(Dataset):
     """Dataset class for the SAE based on PyTorch's"""
