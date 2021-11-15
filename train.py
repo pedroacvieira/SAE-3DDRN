@@ -12,10 +12,12 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from utils.config import DFFNConfig
-from utils.dataset import DFFNDataset
+from utils.config import SAE3DConfig
+from utils.dataset import SAEDataset, DRNDataset
 from utils.tools import *
-from net.dffn_indian_pines import DFFN
+from net.sae import SAE
+from net.drn import DRN
+from train_stacked_autoencoder import train_stacked_autoencoder
 from test import test_model
 
 # Import tensorboard
@@ -27,15 +29,15 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Train
 def train():
-    cfg = DFFNConfig('config.yaml')
+    cfg = SAE3DConfig('config.yaml')
 
     # Start tensorboard
     writer = None
     if cfg.use_tensorboard:
         writer = SummaryWriter(cfg.tensorboard_folder)
 
-    # Load raw dataset, apply PCA and normalize dataset.
-    data = HSIData(cfg.dataset, cfg.data_folder, cfg.sample_bands)
+    # Load raw dataset, apply normalization.
+    data = HSIData(cfg.dataset, cfg.data_folder)
 
     # Load a checkpoint
     if cfg.use_checkpoint:
@@ -64,21 +66,38 @@ def train():
 
         # Generate samples or read existing samples
         if cfg.generate_samples and first_epoch == 0:
-            train_gt, test_gt, val_gt = data.sample_dataset(cfg.train_split, cfg.val_split, cfg.max_samples)
+            train_gt, test_gt, val_gt =\
+                HSIData.sample_dataset(data.ground_truth, cfg.train_split, cfg.val_split, cfg.max_samples)
             HSIData.save_samples(train_gt, test_gt, val_gt, cfg.split_folder, cfg.train_split, cfg.val_split, run)
         else:
             train_gt, _, val_gt = HSIData.load_samples(cfg.split_folder, cfg.train_split, cfg.val_split, run)
 
+        if first_epoch == 0:
+            # Train SAE for dimension reduction. Return best SAE
+            sae = train_stacked_autoencoder(data, train_gt, val_gt, cfg)
+            sae_file = cfg.exec_folder + f'runs/sae_model_run_{run}.pth'
+            torch.save(sae.state_dict(), sae_file)
+        else:
+            sae = SAE(data.image.shape[2], cfg.sae_hidden_layers)
+            sae_dict = torch.load(cfg.exec_folder + f'runs/sae_model_run_{run}.pth')
+            sae.load_state_dict(sae_dict)
+
+        sae_image = sae(data.image)
+
+        # Remove negative numbers in the ground truth after the SAE has been trained
+        train_gt = HSIData.remove_negative_gt(train_gt)
+        val_gt = HSIData.remove_negative_gt(val_gt)
+
         # Create train and test dataset objects
-        train_dataset = DFFNDataset(data.image, train_gt, cfg.sample_size, data_augmentation=True)
-        val_dataset = DFFNDataset(data.image, val_gt, cfg.sample_size, data_augmentation=False)
+        train_dataset = DRNDataset(sae_image, train_gt, cfg.sample_size, data_augmentation=True)
+        val_dataset = DRNDataset(sae_image, val_gt, cfg.sample_size, data_augmentation=False)
 
         # Create train and test loaders
         train_loader = DataLoader(train_dataset, batch_size=cfg.train_batch_size, shuffle=True, num_workers=4)
         val_loader = DataLoader(val_dataset, batch_size=cfg.test_batch_size, shuffle=False)
 
         # Setup model, optimizer, loss and scheduler
-        model = nn.DataParallel(DFFN(cfg.sample_bands, data.num_classes))
+        model = nn.DataParallel(DRN(cfg.sample_bands, data.num_classes))
         criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.SGD(model.parameters(), lr=cfg.learning_rate, momentum=cfg.momentum,
                                     weight_decay=cfg.weight_decay)
@@ -190,8 +209,8 @@ def train():
         first_epoch = 0
 
         # Save trained model
-        model_file = cfg.exec_folder + f'runs/dffn_model_run_{run}.pth'
-        run_best_file = cfg.exec_folder + f'runs/dffn_best_model_run_{run}.pth'
+        model_file = cfg.exec_folder + f'runs/drn_model_run_{run}.pth'
+        run_best_file = cfg.exec_folder + f'runs/drn_best_model_run_{run}.pth'
         torch.save(model.state_dict(), model_file)
         torch.save(run_best_model, run_best_file)
         print(f'Finished training run {run + 1}')

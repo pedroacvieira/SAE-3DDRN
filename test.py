@@ -9,15 +9,17 @@ Created on Tue Nov 9 17:57 2021
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as f
 from torch.utils.data import DataLoader
 import numpy as np
 from sklearn import metrics
 from tqdm import tqdm
 
-from utils.config import DFFNConfig
-from utils.dataset import DFFNDataset
+from utils.config import SAE3DConfig
+from utils.dataset import SAEDataset, DRNDataset
 from utils.tools import *
-from net.dffn import DFFN
+from net.sae import SAE
+from net.drn import DRN
 
 # Import tensorboard
 from torch.utils.tensorboard import SummaryWriter
@@ -35,7 +37,7 @@ CONFIG_FILE = ''  # Empty string to load default 'config.yaml'
 def test():
     # Load config data from training
     config_file = 'config.yaml' if not CONFIG_FILE else CONFIG_FILE
-    cfg = DFFNConfig(config_file, test=True)
+    cfg = SAE3DConfig(config_file, test=True)
 
     # Start tensorboard
     writer = None
@@ -48,21 +50,36 @@ def test():
         print('Testing best models from each run!')
 
     # Load processed dataset
-    data = torch.load(cfg.exec_folder + 'proc_data.pth')
+    data = torch.load(cfg.exec_folder + 'proc_image.pth')
 
     for run in range(cfg.num_runs):
-        print(f'TESTING RUN {run + 1}/{cfg.num_runs}')
-
-        # Load test ground truth and initialize test loader
+        print(f'TESTING STACKED AUTOENCODER FROM RUN {run + 1}/{cfg.num_runs}')
         _, test_gt, _ = HSIData.load_samples(cfg.split_folder, cfg.train_split, cfg.val_split, run)
-        test_dataset = DFFNDataset(data, test_gt, cfg.sample_size, data_augmentation=False)
+
+        test_dataset = SAEDataset(data.image, test_gt)
+        test_loader = DataLoader(test_dataset, batch_size=cfg.test_batch_size, shuffle=False)
+
+        # Load model
+        sae_file = cfg.exec_folder + f'runs/sae_model_run_' + str(run) + '.pth'
+        sae = SAE(data.image.shape[2], cfg.sae_hidden_layers)
+        sae.state_dict(torch.load(sae_file))
+        sae.eval()
+
+        sae_loss = test_sae_model(sae, test_loader)
+
+        sae_data = sae(torch.from_numpy(data))
+
+        print(f'TESTING RUN {run + 1}/{cfg.num_runs}')
+        # Load test ground truth and initialize test loader
+        test_gt = HSIData.remove_negative_gt(test_gt)
+        test_dataset = DRNDataset(sae_data, test_gt, cfg.sample_size, data_augmentation=False)
         test_loader = DataLoader(test_dataset, batch_size=cfg.test_batch_size, shuffle=False)
 
         num_classes = len(np.unique(test_gt)) - 1
 
         # Load model
-        model_file = cfg.exec_folder + f'runs/sae3d_{test_best}model_run_' + str(run) + '.pth'
-        model = nn.DataParallel(SAE3D(cfg.sample_bands, num_classes))
+        model_file = cfg.exec_folder + f'runs/sae3ddrn_{test_best}model_run_' + str(run) + '.pth'
+        model = nn.DataParallel(DRN(cfg.sample_bands, num_classes))
         model.load_state_dict(torch.load(model_file))
         model.eval()
 
@@ -72,10 +89,28 @@ def test():
         # Test model from the current run
         report = test_model(model, test_loader, writer)
         filename = cfg.results_folder + 'test.txt'
-        save_results(filename, report, run)
+        save_results(filename, report, sae_loss, run)
 
     if cfg.use_tensorboard:
         writer.close()
+
+
+# Test stacked autoencoder
+def test_sae_model(model, loader):
+    total_loss = 0.0
+    model.test(True)
+    with torch.no_grad():
+        for i, pixels in tqdm(enumerate(loader), total=len(loader)):
+            pixels = pixels.to(device)
+            outputs = model(pixels)
+
+            total_loss += f.mse_loss(outputs, pixels)
+    model.test(False)
+
+    avg_loss = total_loss / len(loader)
+    print(f'- Average loss: {avg_loss:f}')
+
+    return avg_loss
 
 
 # Function for performing the tests for a given model and data loader
