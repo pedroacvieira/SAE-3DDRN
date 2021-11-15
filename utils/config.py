@@ -42,6 +42,17 @@ class SAE3DConfig:
             self.gamma = cfg['gamma']
             self.scheduler_step = cfg['scheduler_step']
 
+            # Stacked autoencoder parameters
+            self.sae_hidden_layers = cfg['sae_hidden_layers']
+            self.sae_train_batch_size = cfg['sae_train_batch_size']
+            self.sae_test_batch_size = cfg['sae_test_batch_size']
+            self.sae_num_epochs = cfg['sae_num_epochs']
+            self.sae_learning_rate = cfg['sae_learning_rate']
+            self.sae_momentum = cfg['sae_momentum']
+            self.sae_weight_decay = float(cfg['sae_weight_decay'])
+            self.sae_gamma = cfg['sae_gamma']
+            self.sae_scheduler_step = cfg['sae_scheduler_step']
+
             # Other options
             self.test_best_models = cfg['test_best_models']
             self.use_checkpoint = cfg['use_checkpoint']

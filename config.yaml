@@ -22,6 +22,14 @@ weight_decay: 1e-4  # The weight decay for the optimizer
 gamma: 0.1  # Gamma parameter for the lr scheduler
 scheduler_step: 5000  # Step size for the lr scheduler
 sae_hidden_layers: [80, 60, 40, 10]  # Number of channels for each of the hidden layers of the SAE
+sae_train_batch_size: 400  # Batch size for every train iteration
+sae_test_batch_size: 50  # Batch size for every test iteration
+sae_num_epochs: 15  # Number of epochs for the stacked autoencoder
+sae_learning_rate: 0.1  # Initial learning rate for the stacked autoencoder
+sae_momentum: 0.9  # Momentum of optimizer for the stacked autoencoder
+sae_weight_decay: 1e-4  # The weight decay for the optimizer for the stacked autoencoder
+sae_gamma: 0.1  # Gamma parameter for the lr scheduler for the stacked autoencoder
+sae_scheduler_step: 300  # Step size for the lr scheduler for the stacked autoencoder
 
 # Other options
 test_best_models: True  # Whether to test the best model of each run
@@ -29,5 +37,5 @@ use_checkpoint: False  # Whether to load a checkpoint during training
 results_folder: 'results/'  # Folder where to write the validation and test results
 checkpoint_folder: 'checkpoints/'  # Folder where to keep checkpoints
 checkpoint_file: null  # What checkpoint file to load (null for the latest)
-print_frequency: 10  # The amount of iterations between every step/loss print
+print_frequency: 100  # The amount of iterations between every step/loss print
 use_tensorboard: False  # Whether to use tensor boar for training information
