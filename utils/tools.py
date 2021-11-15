@@ -86,13 +86,14 @@ class HSIData:
         return out_img
 
     # Split ground-truth pixels into train, test, val
-    def sample_dataset(self, train_size=0.8, val_size=0.1, max_train_samples=None):
+    @staticmethod
+    def sample_dataset(ground_truth, train_size=0.8, val_size=0.1, max_train_samples=None):
         assert 1 >= train_size > 0, 'Train set size should be a value between 0 and 1'
         assert 1 > val_size >= 0, 'Validation set size should be a value between 0 and 1'
         assert train_size + val_size < 1, 'Train and validation sets should not use the whole dataset'
 
         # Get train samples and non-train samples (== test samples, when there is no validation set)
-        train_gt, test_gt = self.split_ground_truth(self.ground_truth, train_size, max_train_samples)
+        train_gt, test_gt = HSIData.split_ground_truth(ground_truth, train_size, max_train_samples)
 
         val_gt = None
         if val_size > 0:
@@ -100,19 +101,18 @@ class HSIData:
                 None if max_train_samples is None else int(max_train_samples * np.ceil(val_size / train_size))
 
             relative_val_size = val_size / (1 - train_size)
-            val_gt, test_gt = self.split_ground_truth(test_gt, relative_val_size, max_val_samples)
+            val_gt, test_gt = HSIData.split_ground_truth(test_gt, relative_val_size, max_val_samples)
 
         return train_gt, test_gt, val_gt
 
     @staticmethod
     def split_ground_truth(ground_truth, set1_size, max_samples=None):
-        set1_gt = np.zeros_like(ground_truth)
+        # Set unused labels to -1, since the label 0 is now a valid label for the SAE
+        set1_gt = -np.ones_like(ground_truth)
         set2_gt = np.copy(ground_truth)
 
         set1_index_list = []
         for c in np.unique(ground_truth):
-            if c == 0:
-                continue
             class_indices = np.nonzero(ground_truth == c)
             index_tuples = list(zip(*class_indices))  # Tuples with (x, y) index values
 
@@ -122,12 +122,22 @@ class HSIData:
 
         set1_indices = tuple(zip(*set1_index_list))
         set1_gt[set1_indices] = ground_truth[set1_indices]
-        set2_gt[set1_indices] = 0
+        set2_gt[set1_indices] = -1
         return set1_gt, set2_gt
+
+    # Method for removing negative numbers in the ground truth after the SAE has been trained
+    @staticmethod
+    def remove_negative_gt(ground_truth):
+        non_negative_gt = np.copy(ground_truth)
+
+        negative_indices = np.nonzero(ground_truth == -1)
+        non_negative_gt[negative_indices] = 0
+
+        return ground_truth
 
     # Save information needed for testing
     def save_data(self, exec_folder):
-        torch.save(self.image, exec_folder + 'proc_data.pth')
+        torch.save(self.image, exec_folder + 'proc_image.pth')
 
     # Load samples from hard drive for every run.
     @staticmethod
@@ -182,7 +192,7 @@ def load_checkpoint(checkpoint_folder, file):
     return values_state, train_states, best_model_state
 
 
-def save_results(filename, report, run, epoch=-1, validation=False):
+def save_results(filename, report, sae_loss, run, epoch=-1, validation=False):
     mode = 'VALIDATION' if validation else 'TEST'
 
     epoch_str = ''
@@ -198,6 +208,7 @@ def save_results(filename, report, run, epoch=-1, validation=False):
         file.write(f'\n- OVERALL ACCURACY: {report["overall_accuracy"]:f}\n')
         file.write(f'\n- AVERAGE ACCURACY: {report["average_accuracy"]:f}\n')
         file.write(f'\n- KAPPA COEFFICIENT: {report["kappa"]:f}\n')
+        file.write(f'\n- STACKED AUTOENCODER LOSS: {sae_loss:f}\n')
         file.write('\n')
         file.write('#' * 70)
         file.write('\n\n')
