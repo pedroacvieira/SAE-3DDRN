@@ -79,19 +79,17 @@ class DRNDataset(Dataset):
         return data
 
 
-# TODO: Fix dataset to not use the whole dataset
 # Dataset class for the SAE network
 class SAEDataset(Dataset):
     """Dataset class for the SAE based on PyTorch's"""
 
-    def __init__(self, data):
+    def __init__(self, data, split):
         super(SAEDataset, self).__init__()
 
         self.data = data
 
-        height_idx = list(range(data.shape[0]))
-        width_idx = list(range(data.shape[1]))
-        self.indices = [(x, y) for x in height_idx for y in width_idx]
+        split_indices = np.nonzero(split > -1)
+        self.indices = list(zip(*split_indices))
 
     def __len__(self):
         return len(self.indices)
