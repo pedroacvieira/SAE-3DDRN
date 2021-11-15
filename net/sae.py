@@ -17,18 +17,23 @@ class SAE(nn.Module):
 
         # Create list for the encoders and decoders
         self.num_layers = len(hidden_channels)
-        self.encoders = []
-        self.decoders = []
+        self.encoders = nn.ModuleList([])
+        self.decoders = nn.ModuleList([])
 
         # Fill lists according to channel settings
         previous_channels = input_channels
-        for num_channels in hidden_channels:
-            self.encoders.append(nn.Linear(previous_channels, num_channels))
-            self.decoders.append(nn.Linear(num_channels, previous_channels))
+        for i, num_channels in enumerate(hidden_channels):
+            self.encoders.append(nn.Sequential(nn.Linear(previous_channels, num_channels),
+                                               nn.Tanh()))
+            self.decoders.append(nn.Sequential(nn.Linear(num_channels, previous_channels),
+                                               nn.Sigmoid() if i == 0 else nn.Tanh()))
             previous_channels = num_channels
-        self.decoders.reverse()
 
         self.training_layer = -1
+        self.testing = False
+
+    def test(self, test_status):
+        self.testing = test_status
 
     def set_training_layer(self, layer):
         self.training_layer = layer
@@ -40,22 +45,19 @@ class SAE(nn.Module):
                 self.encoders[i].requires_grad_(False)
                 self.decoders[i].requires_grad_(False)
 
+    # It outputs decoded values for training and testing modes and encoded values otherwise
     def forward(self, x):
-        data = x
+        assert self.training_layer >= 0 or not self.training, "A training layer must be selected for training"
+
+        num_layers = len(self.encoders) if self.training_layer < 0 else self.training_layer + 1
+        layers = range(num_layers)
+
         out = x
+        for i in layers:
+            out = self.encoders[i](out)
 
-        if self.training:
-            assert self.training_layer >= 0, "A training layer must be selected"
+        if self.training or self.testing:
+            for i in reversed(layers):
+                out = self.decoders[i](out)
 
-            for i in range(self.training_layer + 1):
-                if i == self.training_layer:
-                    data = out  # Save input for training layer
-                out = self.encoders[i](out)
-
-            out = self.decoders[self.training_layer](out)
-        else:
-            # If not training, run the entire network
-            for encoder in self.encoders:
-                out = encoder(out)
-
-        return out, data
+        return out
