@@ -54,7 +54,7 @@ class DRNDataset(Dataset):
         label = np.asarray(np.copy(label), dtype='int64')
 
         # Load the data into PyTorch tensors
-        data = torch.from_numpy(data)
+        data = torch.from_numpy(data).unsqueeze(0)
         label = torch.from_numpy(label)
         return data, label
 
