@@ -82,6 +82,7 @@ def train():
             sae_dict = torch.load(cfg.exec_folder + f'runs/sae_model_run_{run}.pth')
             sae.load_state_dict(sae_dict)
 
+        # TODO: Possibly convert it back to numpy array
         sae_image = sae(torch.from_numpy(data.image))
 
         # Remove negative numbers in the ground truth after the SAE has been trained
@@ -97,7 +98,7 @@ def train():
         val_loader = DataLoader(val_dataset, batch_size=cfg.test_batch_size, shuffle=False)
 
         # Setup model, optimizer, loss and scheduler
-        model = nn.DataParallel(DRN(cfg.sample_bands, data.num_classes))
+        model = nn.DataParallel(DRN(data.num_classes, cfg.drop_out))
         criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.SGD(model.parameters(), lr=cfg.learning_rate, momentum=cfg.momentum,
                                     weight_decay=cfg.weight_decay)
