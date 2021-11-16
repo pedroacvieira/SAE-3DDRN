@@ -82,8 +82,8 @@ def train():
             sae_dict = torch.load(cfg.exec_folder + f'runs/sae_model_run_{run}.pth')
             sae.load_state_dict(sae_dict)
 
-        # TODO: Possibly convert it back to numpy array
         sae_image = sae(torch.from_numpy(data.image))
+        sae_image = sae_image.numpy()
 
         # Remove negative numbers in the ground truth after the SAE has been trained
         train_gt = HSIData.remove_negative_gt(train_gt)
