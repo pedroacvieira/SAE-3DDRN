@@ -42,7 +42,7 @@ def train_stacked_autoencoder(data, train_gt, val_gt, cfg):
     total_steps = len(train_loader)
     total_layers = len(cfg.sae_hidden_layers)
     for layer in range(total_layers):
-        print(f'TRAINING AUTOENCODER LAYER {layer + 1}/{len(cfg.sae_hidden_layers)}')
+        print(f'TRAINING AUTOENCODER LAYER {layer + 1}/{total_layers}')
         model.set_training_layer(layer)
 
         # Restart optimizer and lr scheduler for every layer
@@ -56,7 +56,7 @@ def train_stacked_autoencoder(data, train_gt, val_gt, cfg):
         best_error = float('inf')
 
         for epoch in range(cfg.sae_num_epochs[layer]):
-            print(f'STARTING AUTOENCODER EPOCH {epoch + 1}/{cfg.sae_num_epochs}')
+            print(f'STARTING AUTOENCODER EPOCH {epoch + 1}/{cfg.sae_num_epochs[layer]}')
 
             running_loss = 0.0
 
@@ -81,7 +81,7 @@ def train_stacked_autoencoder(data, train_gt, val_gt, cfg):
 
                     # Print data
                     tqdm.write(
-                        f'\tLayer [{layer + 1}/{total_layers}]\tEpoch [{epoch + 1}/{cfg.sae_num_epochs}]'
+                        f'\tLayer [{layer + 1}/{total_layers}]\tEpoch [{epoch + 1}/{cfg.sae_num_epochs[layer]}]'
                         f'\tStep [{i + 1}/{total_steps}]\tLoss: {avg_loss:.5f}')
 
             # Run validation
@@ -96,7 +96,7 @@ def train_stacked_autoencoder(data, train_gt, val_gt, cfg):
                     best_layer = (model.encoders[layer].state_dict(), model.decoders[layer].state_dict())
 
         # Set the layer values to the best result during training
-        print(f'FINISHED TRAINING LAYER {layer + 1}/{len(cfg.sae_hidden_layers)}, LOADING BEST VALUES.')
+        print(f'FINISHED TRAINING LAYER {layer + 1}/{total_layers}, LOADING BEST VALUES.')
         model.encoders[layer].load_state_dict(best_layer[0])
         model.decoders[layer].load_state_dict(best_layer[1])
 
