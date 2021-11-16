@@ -35,15 +35,21 @@ class SAE(nn.Module):
     def test(self, test_status):
         self.testing = test_status
 
+    def train(self, mode=True):
+        super(SAE, self).train(mode)
+
+        if mode and self.training_layer >= 0:
+            self.set_training_layer(self.training_layer)
+
     def set_training_layer(self, layer):
         self.training_layer = layer
         for i in range(len(self.encoders)):
             if i == layer:
-                self.encoders[i].requires_grad_(True)
-                self.decoders[i].requires_grad_(True)
+                self.encoders[i].train()
+                self.decoders[i].train()
             else:
-                self.encoders[i].requires_grad_(False)
-                self.decoders[i].requires_grad_(False)
+                self.encoders[i].eval()
+                self.decoders[i].eval()
 
     # It outputs decoded values for training and testing modes and encoded values otherwise
     def forward(self, x):
