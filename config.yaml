@@ -16,8 +16,8 @@ sample_size: 25  # Window size for every sample/pixel input
 sample_bands: 3  # Number of bands after applying PCA
 num_runs: 1  # The amount of time the whole experiment should run
 num_epochs: 5  # Number of epochs per run
-learning_rate: 0.1  # Initial learning rate
-momentum: 0.9  # Momentum of optimizer
+learning_rate: 0.001  # Initial learning rate
+betas: [0.9, 0.999]  # Betas for Adam optimizer
 weight_decay: 1e-4  # The weight decay for the optimizer
 gamma: 0.1  # Gamma parameter for the lr scheduler
 scheduler_step: 5000  # Step size for the lr scheduler
@@ -29,7 +29,7 @@ sae_train_batch_size: 400  # Batch size for every train iteration
 sae_test_batch_size: 50  # Batch size for every test iteration
 sae_num_epochs: [15, 10, 8, 5]  # Number of epochs for every autoencoder
 sae_learning_rate: [0.1, 0.1, 0.01, 0.01]  # Initial learning rate for every autoencoder
-sae_momentum: 0.9  # Momentum of optimizer for the stacked autoencoder
+sae_betas: [0.9, 0.999]  # Betas of Adam optimizer for the stacked autoencoder
 sae_weight_decay: 1e-4  # The weight decay for the optimizer for the stacked autoencoder
 sae_gamma: 0.1  # Gamma parameter for the lr scheduler for the stacked autoencoder
 sae_scheduler_step: [4000, 2000, 2000, 1000]  # Step size for the lr scheduler for every autoencoder

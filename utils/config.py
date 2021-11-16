@@ -37,7 +37,7 @@ class SAE3DConfig:
             self.num_runs = cfg['num_runs']
             self.num_epochs = cfg['num_epochs']
             self.learning_rate = cfg['learning_rate']
-            self.momentum = cfg['momentum']
+            self.betas = tuple(cfg['betas'])
             self.weight_decay = float(cfg['weight_decay'])
             self.gamma = cfg['gamma']
             self.scheduler_step = cfg['scheduler_step']
@@ -49,7 +49,7 @@ class SAE3DConfig:
             self.sae_test_batch_size = cfg['sae_test_batch_size']
             self.sae_num_epochs = cfg['sae_num_epochs']
             self.sae_learning_rate = cfg['sae_learning_rate']
-            self.sae_momentum = cfg['sae_momentum']
+            self.sae_betas = tuple(cfg['sae_betas'])
             self.sae_weight_decay = float(cfg['sae_weight_decay'])
             self.sae_gamma = cfg['sae_gamma']
             self.sae_scheduler_step = cfg['sae_scheduler_step']
