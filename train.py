@@ -100,8 +100,8 @@ def train():
         # Setup model, optimizer, loss and scheduler
         model = nn.DataParallel(DRN(data.num_classes, cfg.drop_out))
         criterion = nn.CrossEntropyLoss()
-        optimizer = torch.optim.SGD(model.parameters(), lr=cfg.learning_rate, momentum=cfg.momentum,
-                                    weight_decay=cfg.weight_decay)
+        optimizer = torch.optim.Adam(model.parameters(), lr=cfg.learning_rate, betas=cfg.betas,
+                                     weight_decay=cfg.weight_decay)
         lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=cfg.scheduler_step, gamma=cfg.gamma)
 
         # Start counting loss and correct predictions

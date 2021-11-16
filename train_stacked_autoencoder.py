@@ -46,8 +46,8 @@ def train_stacked_autoencoder(data, train_gt, val_gt, cfg):
         model.set_training_layer(layer)
 
         # Restart optimizer and lr scheduler for every layer
-        optimizer = torch.optim.SGD(model.parameters(), lr=cfg.sae_learning_rate[layer], momentum=cfg.sae_momentum,
-                                    weight_decay=cfg.sae_weight_decay)
+        optimizer = torch.optim.Adam(model.parameters(), lr=cfg.sae_learning_rate[layer], betas=cfg.sae_betas,
+                                     weight_decay=cfg.sae_weight_decay)
         lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=cfg.sae_scheduler_step[layer],
                                                        gamma=cfg.sae_gamma)
 
