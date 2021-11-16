@@ -108,7 +108,7 @@ def test_sae_model(model, loader):
     model.test(False)
 
     avg_loss = total_loss / len(loader)
-    print(f'- Average loss: {avg_loss:f}')
+    print(f'- Average loss: {avg_loss:5f}')
 
     return avg_loss
 
