@@ -46,15 +46,16 @@ def train_stacked_autoencoder(data, train_gt, val_gt, cfg):
         model.set_training_layer(layer)
 
         # Restart optimizer and lr scheduler for every layer
-        optimizer = torch.optim.SGD(model.parameters(), lr=cfg.sae_learning_rate, momentum=cfg.sae_momentum,
+        optimizer = torch.optim.SGD(model.parameters(), lr=cfg.sae_learning_rate[layer], momentum=cfg.sae_momentum,
                                     weight_decay=cfg.sae_weight_decay)
-        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=cfg.sae_scheduler_step, gamma=cfg.sae_gamma)
+        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=cfg.sae_scheduler_step[layer],
+                                                       gamma=cfg.sae_gamma)
 
         # Save best models per run
         best_layer = (None, None)
         best_error = float('inf')
 
-        for epoch in range(cfg.sae_num_epochs):
+        for epoch in range(cfg.sae_num_epochs[layer]):
             print(f'STARTING AUTOENCODER EPOCH {epoch + 1}/{cfg.sae_num_epochs}')
 
             running_loss = 0.0
