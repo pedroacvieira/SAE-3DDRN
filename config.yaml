@@ -21,15 +21,17 @@ momentum: 0.9  # Momentum of optimizer
 weight_decay: 1e-4  # The weight decay for the optimizer
 gamma: 0.1  # Gamma parameter for the lr scheduler
 scheduler_step: 5000  # Step size for the lr scheduler
+
+# Stacked autoencoder parameters
 sae_hidden_layers: [80, 60, 40, 10]  # Number of channels for each of the hidden layers of the SAE
 sae_train_batch_size: 400  # Batch size for every train iteration
 sae_test_batch_size: 50  # Batch size for every test iteration
-sae_num_epochs: 15  # Number of epochs for the stacked autoencoder
-sae_learning_rate: 0.1  # Initial learning rate for the stacked autoencoder
+sae_num_epochs: [15, 10, 8, 5]  # Number of epochs for the stacked autoencoder
+sae_learning_rate: [0.1, 0.1, 0.01, 0.01]  # Initial learning rate for the stacked autoencoder
 sae_momentum: 0.9  # Momentum of optimizer for the stacked autoencoder
 sae_weight_decay: 1e-4  # The weight decay for the optimizer for the stacked autoencoder
 sae_gamma: 0.1  # Gamma parameter for the lr scheduler for the stacked autoencoder
-sae_scheduler_step: 300  # Step size for the lr scheduler for the stacked autoencoder
+sae_scheduler_step: [4000, 2000, 2000, 1000]  # Step size for the lr scheduler for the stacked autoencoder
 
 # Other options
 test_best_models: True  # Whether to test the best model of each run
