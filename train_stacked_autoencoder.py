@@ -86,7 +86,7 @@ def train_stacked_autoencoder(data, train_gt, val_gt, cfg):
 
             # Run validation
             if cfg.val_split > 0:
-                print("STARTING VALIDATION {}/{}".format(epoch + 1, cfg.sae_num_epochs))
+                print(f'STARTING VALIDATION {epoch + 1}/{cfg.sae_num_epochs[layer]}')
                 model.eval()
                 error = test_sae_model(model, val_loader)
                 model.train()
