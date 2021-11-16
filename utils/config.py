@@ -41,6 +41,7 @@ class SAE3DConfig:
             self.weight_decay = float(cfg['weight_decay'])
             self.gamma = cfg['gamma']
             self.scheduler_step = cfg['scheduler_step']
+            self.drop_out = cfg['drop_out']
 
             # Stacked autoencoder parameters
             self.sae_hidden_layers = cfg['sae_hidden_layers']
