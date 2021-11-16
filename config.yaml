@@ -7,7 +7,7 @@ split_folder: 'data_split/'  # Where to store dataset splits
 val_split: 0.2  # Fraction from the dataset used for validation [0, 1]
 train_split: 0.5  # Fraction from the dataset used for training [0, 1]
 generate_samples: True  # Whether the samples should be generated (False to load previously saved samples)
-max_samples: 6000  # max training samples per class (null for no limit)
+max_samples: 4000  # max training samples per class (null for no limit)
 
 # Hyper parameters
 train_batch_size: 100  # Batch size for every train iteration
