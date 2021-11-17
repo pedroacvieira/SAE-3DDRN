@@ -75,8 +75,8 @@ def train_stacked_autoencoder(data, train_gt, val_gt, cfg):
                 optimizer.step()
                 lr_scheduler.step()
 
-                if (i + 1) % cfg.print_frequency == 0:
-                    avg_loss = running_loss / cfg.print_frequency
+                if (i + 1) % cfg.sae_print_frequency == 0:
+                    avg_loss = running_loss / cfg.sae_print_frequency
                     running_loss = 0.0
 
                     # Print data
@@ -100,5 +100,4 @@ def train_stacked_autoencoder(data, train_gt, val_gt, cfg):
         model.encoders[layer].load_state_dict(best_layer[0])
         model.decoders[layer].load_state_dict(best_layer[1])
 
-    model.eval()
     return model
