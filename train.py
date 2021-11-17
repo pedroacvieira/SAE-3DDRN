@@ -90,6 +90,8 @@ def train():
         train_gt = HSIData.remove_negative_gt(train_gt)
         val_gt = HSIData.remove_negative_gt(val_gt)
 
+        print('STARTING TRAIN OF 3DDRN NETWORK')
+
         # Create train and test dataset objects
         train_dataset = DRNDataset(sae_image, train_gt, cfg.sample_size, data_augmentation=True)
         val_dataset = DRNDataset(sae_image, val_gt, cfg.sample_size, data_augmentation=False)
