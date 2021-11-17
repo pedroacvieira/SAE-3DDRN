@@ -75,15 +75,16 @@ def train():
         if first_epoch == 0:
             # Train SAE for dimension reduction. Return best SAE
             sae = train_stacked_autoencoder(data, train_gt, val_gt, cfg)
-            sae_file = cfg.exec_folder + f'runs/sae_model_run_{run}.pth'
-            torch.save(sae.state_dict(), sae_file)
+            torch.save(sae.state_dict(), cfg.exec_folder + f'runs/sae_model_run_{run}.pth')
         else:
             sae = SAE(data.image.shape[2], cfg.sae_hidden_layers)
             sae_dict = torch.load(cfg.exec_folder + f'runs/sae_model_run_{run}.pth')
             sae.load_state_dict(sae_dict)
+        sae.eval()
 
+        # Apply dimension reduction to image
         sae_image = sae(torch.from_numpy(data.image))
-        sae_image = sae_image.numpy()
+        sae_image = sae_image.detach().numpy()
 
         # Remove negative numbers in the ground truth after the SAE has been trained
         train_gt = HSIData.remove_negative_gt(train_gt)
@@ -180,7 +181,7 @@ def train():
 
                 # Save validation results
                 filename = cfg.results_folder + 'validations.txt'
-                save_results(filename, report, run, epoch, validation=True)
+                save_results(filename, report, None, run, epoch, validation=True)
 
                 accuracy = report['overall_accuracy']
                 if accuracy > run_best_accuracy:
