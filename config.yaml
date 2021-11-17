@@ -1,6 +1,6 @@
 # Dataset settings
 dataset: 'PaviaU'  # PaviaU; IndianPines; Salinas
-experiment: 'prototype_01'  # Name for the experiment (will be used to load all information)
+experiment: 'prototype_02'  # Name for the experiment (will be used to load all information)
 data_folder: './datasets/'  # Dataset folder
 exec_folder: './experiments/'  # Folder where to keep all the experiment data
 split_folder: 'data_split/'  # Where to store dataset splits
@@ -40,5 +40,6 @@ use_checkpoint: False  # Whether to load a checkpoint during training
 results_folder: 'results/'  # Folder where to write the validation and test results
 checkpoint_folder: 'checkpoints/'  # Folder where to keep checkpoints
 checkpoint_file: null  # What checkpoint file to load (null for the latest)
-print_frequency: 150  # The amount of iterations between every step/loss print
+print_frequency: 20  # The amount of iterations between every step/loss print
+sae_print_frequency: 100  # The amount of iterations between every step/loss print
 use_tensorboard: False  # Whether to use tensor boar for training information

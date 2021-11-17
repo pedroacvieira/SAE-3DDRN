@@ -61,6 +61,7 @@ class SAE3DConfig:
             self.checkpoint_folder = self. exec_folder + cfg['checkpoint_folder'] + self.dataset + '/'
             self.checkpoint_file = cfg['checkpoint_file']
             self.print_frequency = cfg['print_frequency']
+            self.sae_print_frequency = cfg['sae_print_frequency']
             self.use_tensorboard = cfg['use_tensorboard']
             if self.use_tensorboard:
                 self.tensorboard_folder = self.exec_folder + 'tensorboard/'
