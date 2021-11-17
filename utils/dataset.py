@@ -88,7 +88,7 @@ class SAEDataset(Dataset):
 
         self.data = data
 
-        split_indices = np.nonzero(split > -1)
+        split_indices = np.nonzero(split != 255)
         self.indices = list(zip(*split_indices))
 
     def __len__(self):

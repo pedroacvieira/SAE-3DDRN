@@ -113,6 +113,8 @@ class HSIData:
 
         set1_index_list = []
         for c in np.unique(ground_truth):
+            if c == 255:
+                continue
             class_indices = np.nonzero(ground_truth == c)
             index_tuples = list(zip(*class_indices))  # Tuples with (x, y) index values
 
@@ -122,7 +124,7 @@ class HSIData:
 
         set1_indices = tuple(zip(*set1_index_list))
         set1_gt[set1_indices] = ground_truth[set1_indices]
-        set2_gt[set1_indices] = -1
+        set2_gt[set1_indices] = 255
         return set1_gt, set2_gt
 
     # Method for removing negative numbers in the ground truth after the SAE has been trained
@@ -130,10 +132,10 @@ class HSIData:
     def remove_negative_gt(ground_truth):
         non_negative_gt = np.copy(ground_truth)
 
-        negative_indices = np.nonzero(ground_truth == -1)
+        negative_indices = np.nonzero(ground_truth == 255)
         non_negative_gt[negative_indices] = 0
 
-        return ground_truth
+        return non_negative_gt
 
     # Save information needed for testing
     def save_data(self, exec_folder):
@@ -208,7 +210,8 @@ def save_results(filename, report, sae_loss, run, epoch=-1, validation=False):
         file.write(f'\n- OVERALL ACCURACY: {report["overall_accuracy"]:f}\n')
         file.write(f'\n- AVERAGE ACCURACY: {report["average_accuracy"]:f}\n')
         file.write(f'\n- KAPPA COEFFICIENT: {report["kappa"]:f}\n')
-        file.write(f'\n- STACKED AUTOENCODER LOSS: {sae_loss:f}\n')
+        if sae_loss is not None:
+            file.write(f'\n- STACKED AUTOENCODER LOSS: {sae_loss:f}\n')
         file.write('\n')
         file.write('#' * 70)
         file.write('\n\n')
