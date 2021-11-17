@@ -44,13 +44,13 @@ class DRN(nn.Module):
         self.block1 = nn.Sequential(nn.Conv3d(1, 16, (3, 3, 3)),
                                     nn.BatchNorm3d(16), self.relu,
                                     ResidualBlock(16), self.relu,
-                                    nn.MaxPool3d((2, 2, 1)))
+                                    nn.MaxPool3d((1, 2, 2)))
         self.block2 = nn.Sequential(nn.Conv3d(16, 32, (3, 3, 3), padding=1),
-                                    nn.BatchNorm3d(16), self.relu,
+                                    nn.BatchNorm3d(32), self.relu,
                                     ResidualBlock(32), self.relu,
-                                    nn.MaxPool3d((2, 2, 1)))
+                                    nn.MaxPool3d((1, 2, 2)))
         self.block3 = nn.Sequential(nn.Conv3d(32, 64, (3, 3, 3), padding=1),
-                                    nn.BatchNorm3d(16), self.relu,
+                                    nn.BatchNorm3d(64), self.relu,
                                     ResidualBlock(64), self.relu,
                                     nn.MaxPool3d((2, 2, 2)),
                                     nn.BatchNorm3d(64))  # Output size should be [2, 2, 4, 64]
