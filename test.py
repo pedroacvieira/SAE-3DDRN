@@ -174,10 +174,8 @@ def get_report(y_pr, y_gt):
 # Compute kappa coefficient
 def kappa(confusion_matrix):
     data_mat = np.mat(confusion_matrix)
-    k = np.min(confusion_matrix.shape[0],
-               confusion_matrix.shape[1])
     p_0 = 0.0
-    for i in range(k):
+    for i in range(confusion_matrix.shape[0]):
         p_0 += data_mat[i, i] * 1.0
     x_sum = np.sum(data_mat, axis=1)
     y_sum = np.sum(data_mat, axis=0)
