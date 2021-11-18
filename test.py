@@ -79,7 +79,7 @@ def test():
 
         # Load model
         model_file = cfg.exec_folder + f'runs/sae3ddrn_{test_best}model_run_' + str(run) + '.pth'
-        model = nn.DataParallel(DRN(cfg.sample_bands, num_classes))
+        model = nn.DataParallel(DRN(num_classes))
         model.load_state_dict(torch.load(model_file))
         model.eval()
 
@@ -157,7 +157,7 @@ def get_report(y_pr, y_gt):
     class_accuracy = metrics.precision_score(y_gt, y_pr, average=None)
     overall_accuracy = metrics.accuracy_score(y_gt, y_pr)
     average_accuracy = np.mean(class_accuracy)
-    kappa_coefficient = kappa(confusion_matrix, 5)
+    kappa_coefficient = kappa(confusion_matrix)
 
     # Save report values
     report = {
@@ -172,8 +172,10 @@ def get_report(y_pr, y_gt):
 
 
 # Compute kappa coefficient
-def kappa(confusion_matrix, k):
+def kappa(confusion_matrix):
     data_mat = np.mat(confusion_matrix)
+    k = np.min(confusion_matrix.shape[0],
+               confusion_matrix.shape[1])
     p_0 = 0.0
     for i in range(k):
         p_0 += data_mat[i, i] * 1.0
