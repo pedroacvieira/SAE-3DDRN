@@ -62,7 +62,7 @@ def train_stacked_autoencoder(data, train_gt, val_gt, cfg):
 
             # Run iterations
             for i, pixels in tqdm(enumerate(train_loader), total=len(train_loader)):
-                pixels.to(device)
+                pixels = pixels.to(device)
 
                 # Forward pass
                 outputs = model(pixels)
