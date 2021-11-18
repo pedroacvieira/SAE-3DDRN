@@ -1,38 +1,37 @@
 # Dataset settings
 dataset: 'PaviaU'  # PaviaU; IndianPines; Salinas
-experiment: 'prototype_02'  # Name for the experiment (will be used to load all information)
+experiment: 'server_01'  # Name for the experiment (will be used to load all information)
 data_folder: './datasets/'  # Dataset folder
 exec_folder: './experiments/'  # Folder where to keep all the experiment data
 split_folder: 'data_split/'  # Where to store dataset splits
-val_split: 0.2  # Fraction from the dataset used for validation [0, 1]
-train_split: 0.5  # Fraction from the dataset used for training [0, 1]
+val_split: 0.1  # Fraction from the dataset used for validation [0, 1]
+train_split: 0.8  # Fraction from the dataset used for training [0, 1]
 generate_samples: True  # Whether the samples should be generated (False to load previously saved samples)
-max_samples: 4000  # max training samples per class (null for no limit)
+max_samples: 6000  # max training samples per class (null for no limit)
 
 # Hyper parameters
 train_batch_size: 100  # Batch size for every train iteration
 test_batch_size: 20  # Batch size for every test iteration
 sample_size: 25  # Window size for every sample/pixel input
-sample_bands: 3  # Number of bands after applying PCA
-num_runs: 1  # The amount of time the whole experiment should run
-num_epochs: 5  # Number of epochs per run
+num_runs: 10  # The amount of time the whole experiment should run
+num_epochs: 50  # Number of epochs per run
 learning_rate: 0.001  # Initial learning rate
 betas: [0.9, 0.999]  # Betas for Adam optimizer
 weight_decay: 1e-4  # The weight decay for the optimizer
 gamma: 0.1  # Gamma parameter for the lr scheduler
-scheduler_step: 5000  # Step size for the lr scheduler
+scheduler_step: 2000  # Step size for the lr scheduler
 drop_out: 0.4  # Drop out parameter for the 3DDRN network
 
 # Stacked autoencoder parameters
 sae_hidden_layers: [80, 60, 40, 10]  # Number of channels for each of the hidden layers of the SAE
-sae_train_batch_size: 300  # Batch size for every train iteration
+sae_train_batch_size: 200  # Batch size for every train iteration
 sae_test_batch_size: 50  # Batch size for every test iteration
-sae_num_epochs: [15, 10, 8, 5]  # Number of epochs for every autoencoder
+sae_num_epochs: [20, 15, 10, 10]  # Number of epochs for every autoencoder
 sae_learning_rate: [0.1, 0.1, 0.01, 0.01]  # Initial learning rate for every autoencoder
 sae_betas: [0.9, 0.999]  # Betas of Adam optimizer for the stacked autoencoder
 sae_weight_decay: 1e-4  # The weight decay for the optimizer for the stacked autoencoder
 sae_gamma: 0.1  # Gamma parameter for the lr scheduler for the stacked autoencoder
-sae_scheduler_step: [4000, 2000, 2000, 1000]  # Step size for the lr scheduler for every autoencoder
+sae_scheduler_step: [4000, 2000, 2000, 1500]  # Step size for the lr scheduler for every autoencoder
 
 # Other options
 test_best_models: True  # Whether to test the best model of each run
@@ -41,5 +40,5 @@ results_folder: 'results/'  # Folder where to write the validation and test resu
 checkpoint_folder: 'checkpoints/'  # Folder where to keep checkpoints
 checkpoint_file: null  # What checkpoint file to load (null for the latest)
 print_frequency: 20  # The amount of iterations between every step/loss print
-sae_print_frequency: 100  # The amount of iterations between every step/loss print
+sae_print_frequency: 20  # The amount of iterations between every step/loss print
 use_tensorboard: False  # Whether to use tensor boar for training information

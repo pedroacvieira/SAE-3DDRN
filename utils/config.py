@@ -33,7 +33,6 @@ class SAE3DConfig:
             self.train_batch_size = cfg['train_batch_size']
             self.test_batch_size = cfg['test_batch_size']
             self.sample_size = cfg['sample_size']
-            self.sample_bands = cfg['sample_bands']
             self.num_runs = cfg['num_runs']
             self.num_epochs = cfg['num_epochs']
             self.learning_rate = cfg['learning_rate']
