@@ -56,20 +56,22 @@ def test():
         print(f'TESTING STACKED AUTOENCODER FROM RUN {run + 1}/{cfg.num_runs}')
         _, test_gt, _ = HSIData.load_samples(cfg.split_folder, cfg.train_split, cfg.val_split, run)
 
-        test_dataset = SAEDataset(data.image, test_gt)
+        test_dataset = SAEDataset(data, test_gt)
         test_loader = DataLoader(test_dataset, batch_size=cfg.test_batch_size, shuffle=False)
 
         # Load model
         sae_file = cfg.exec_folder + f'runs/sae_model_run_' + str(run) + '.pth'
-        sae = SAE(data.image.shape[2], cfg.sae_hidden_layers)
+        sae = SAE(data.shape[2], cfg.sae_hidden_layers)
         sae.state_dict(torch.load(sae_file))
         sae.eval()
 
         sae_loss = test_sae_model(sae, test_loader)
 
+        # Apply dimension reduction to image
         sae_data = sae(torch.from_numpy(data))
+        sae_data = sae_data.detach().numpy()
 
-        print(f'TESTING RUN {run + 1}/{cfg.num_runs}')
+        print(f'TESTING SAE-3DDRN MODEL FROM RUN {run + 1}/{cfg.num_runs}')
         # Load test ground truth and initialize test loader
         test_gt = HSIData.remove_negative_gt(test_gt)
         test_dataset = DRNDataset(sae_data, test_gt, cfg.sample_size, data_augmentation=False)
@@ -78,7 +80,7 @@ def test():
         num_classes = len(np.unique(test_gt)) - 1
 
         # Load model
-        model_file = cfg.exec_folder + f'runs/sae3ddrn_{test_best}model_run_' + str(run) + '.pth'
+        model_file = cfg.exec_folder + f'runs/drn_{test_best}model_run_' + str(run) + '.pth'
         model = nn.DataParallel(DRN(num_classes))
         model.load_state_dict(torch.load(model_file))
         model.eval()
