@@ -96,7 +96,7 @@ class HSIData:
         val_gt = None
         if val_size > 0:
             max_val_samples =\
-                None if max_train_samples is None else int(max_train_samples * np.ceil(val_size / train_size))
+                None if max_train_samples is None else int(np.ceil(max_train_samples * val_size / train_size))
 
             relative_val_size = val_size / (1 - train_size)
             val_gt, test_gt = HSIData.split_ground_truth(test_gt, relative_val_size, max_val_samples)
@@ -106,7 +106,7 @@ class HSIData:
     @staticmethod
     def split_ground_truth(ground_truth, set1_size, max_samples=None):
         # Set unused labels to -1, since the label 0 is now a valid label for the SAE
-        set1_gt = -np.ones_like(ground_truth)
+        set1_gt = np.ones_like(ground_truth) * 255
         set2_gt = np.copy(ground_truth)
 
         set1_index_list = []
