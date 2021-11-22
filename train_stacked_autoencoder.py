@@ -100,4 +100,7 @@ def train_stacked_autoencoder(data, train_gt, val_gt, cfg):
         model.encoders[layer].load_state_dict(best_layer[0])
         model.decoders[layer].load_state_dict(best_layer[1])
 
-    return model.cpu()
+    model = model.cpu()
+    model.eval()
+
+    return model
