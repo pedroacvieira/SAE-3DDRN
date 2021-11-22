@@ -96,7 +96,7 @@ def train_stacked_autoencoder(data, train_gt, val_gt, cfg):
                     best_layer = (model.encoders[layer].state_dict(), model.decoders[layer].state_dict())
 
         # Set the layer values to the best result during training
-        print(f'FINISHED TRAINING LAYER {layer + 1}/{total_layers}, LOADING BEST VALUES.')
+        print(f'FINISHED TRAINING LAYER {layer + 1}/{total_layers}, LOADING BEST VALUES (ERROR: {best_error}).')
         model.encoders[layer].load_state_dict(best_layer[0])
         model.decoders[layer].load_state_dict(best_layer[1])
 
