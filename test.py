@@ -97,6 +97,7 @@ def test():
         writer.close()
 
 
+# TODO: Test autoencoder per class
 # Test stacked autoencoder
 def test_sae_model(model, loader):
     total_loss = 0.0
