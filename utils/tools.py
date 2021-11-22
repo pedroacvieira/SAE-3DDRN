@@ -10,8 +10,7 @@ Created on Tue Nov 09 17:50 2021
 import torch
 import numpy as np
 from scipy import io
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
+from sklearn.preprocessing import MinMaxScaler
 import random
 import os
 import glob
@@ -77,10 +76,9 @@ class HSIData:
         flat_image = np.reshape(image, (image_height * image_width, image_bands))
 
         # Normalize data. Range [-1, 1]
-        sca = StandardScaler()
+        sca = MinMaxScaler()
         sca.fit(flat_image)
         norm_img = sca.transform(flat_image)
-        norm_img = (norm_img + 1) / 2  # Set range from [-1, 1] to [0, 1]
 
         out_img = np.reshape(norm_img, (image_height, image_width, image_bands))
         return out_img
@@ -140,6 +138,11 @@ class HSIData:
     # Save information needed for testing
     def save_data(self, exec_folder):
         torch.save(self.image, exec_folder + 'proc_image.pth')
+
+    # Save information needed for testing
+    @staticmethod
+    def save_sae_data(exec_folder, sae_image):
+        torch.save(sae_image, exec_folder + 'sae_image.pth')
 
     # Load samples from hard drive for every run.
     @staticmethod
