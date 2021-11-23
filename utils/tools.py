@@ -197,7 +197,7 @@ def load_checkpoint(checkpoint_folder, file):
     return values_state, train_states, best_model_state
 
 
-def save_results(filename, report, sae_loss, run, epoch=-1, validation=False):
+def save_results(filename, report, sae_report, run, epoch=-1, validation=False):
     mode = 'VALIDATION' if validation else 'TEST'
 
     epoch_str = ''
@@ -213,8 +213,9 @@ def save_results(filename, report, sae_loss, run, epoch=-1, validation=False):
         file.write(f'\n- OVERALL ACCURACY: {report["overall_accuracy"]:f}\n')
         file.write(f'\n- AVERAGE ACCURACY: {report["average_accuracy"]:f}\n')
         file.write(f'\n- KAPPA COEFFICIENT: {report["kappa"]:f}\n')
-        if sae_loss is not None:
-            file.write(f'\n- STACKED AUTOENCODER LOSS: {sae_loss:f}\n')
+        if sae_report is not None:
+            file.write(f'\n- STACKED AUTOENCODER LOSS: {sae_report["avg_loss"]:f}\n')
+            file.write(f'\n- SAE PER CLASS LOSS:\n{sae_report["per_class_loss"]}\n')
         file.write('\n')
         file.write('#' * 70)
         file.write('\n\n')
