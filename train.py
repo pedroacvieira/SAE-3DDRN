@@ -86,7 +86,7 @@ def train():
         sae_image = sae(torch.from_numpy(data.image))
         sae_image = sae_image.detach().numpy()
         sae_image = HSIData.normalize(sae_image)
-        HSIData.save_sae_data(cfg.exec_folder, sae_image)
+        HSIData.save_sae_data(cfg.exec_folder + f'runs/encoded_image_{run}', sae_image)
 
         # Remove negative numbers in the ground truth after the SAE has been trained
         train_gt = HSIData.remove_negative_gt(train_gt)
