@@ -87,6 +87,7 @@ class SAEDataset(Dataset):
         super(SAEDataset, self).__init__()
 
         self.data = data
+        self.gt = split
 
         split_indices = np.nonzero(split != 255)
         self.indices = list(zip(*split_indices))
@@ -97,7 +98,8 @@ class SAEDataset(Dataset):
     def __getitem__(self, i):
         x, y = self.indices[i]
         data = self.data[x, y]
+        label = self.gt[x, y]
 
         # Load the data into PyTorch tensor
         data = torch.from_numpy(data)
-        return data
+        return data, label
