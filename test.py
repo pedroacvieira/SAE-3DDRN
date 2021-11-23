@@ -55,7 +55,7 @@ def test():
     for run in range(cfg.num_runs):
         print(f'TESTING STACKED AUTOENCODER FROM RUN {run + 1}/{cfg.num_runs}')
         _, test_gt, _ = HSIData.load_samples(cfg.split_folder, cfg.train_split, cfg.val_split, run)
-        num_classes = len(np.unique(test_gt)) - 1
+        num_classes = len(np.unique(test_gt)) - 2
 
         test_dataset = SAEDataset(data, test_gt)
         test_loader = DataLoader(test_dataset, batch_size=cfg.test_batch_size, shuffle=False)
@@ -63,25 +63,15 @@ def test():
         # Load model
         sae_file = cfg.exec_folder + f'runs/sae_model_run_' + str(run) + '.pth'
         sae = SAE(data.shape[2], cfg.sae_hidden_layers)
-        sae.state_dict(torch.load(sae_file))
+        sae.load_state_dict(torch.load(sae_file))
         sae.eval()
 
-        sae_report = test_sae_model(sae, test_loader, num_classes)
+        sae_report = test_sae_model(sae, test_loader, num_classes + 1)
 
-        # TODO: Either solve this or leave the option below
-        # Apply dimension reduction to image
-        sae_data_cal = sae(torch.from_numpy(data))
-        sae_data_cal = sae_data_cal.detach().numpy()
-
-        # TODO: Added for debug
-        sae_data = torch.load(cfg.exec_folder + 'sae_image.pth')
-
-        # TODO: Added for debug
-        diff = sae_data_cal - sae_data
+        sae_data = torch.load(cfg.exec_folder + 'runs/encoded_image_0.pth')
 
         # Remove undefined class from ground truth
         test_gt = HSIData.remove_negative_gt(test_gt)
-        num_classes -= 1
 
         print(f'TESTING SAE-3DDRN MODEL FROM RUN {run + 1}/{cfg.num_runs}')
         # Load test ground truth and initialize test loader
