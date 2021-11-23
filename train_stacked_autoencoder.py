@@ -61,7 +61,7 @@ def train_stacked_autoencoder(data, train_gt, val_gt, cfg):
             running_loss = 0.0
 
             # Run iterations
-            for i, pixels in tqdm(enumerate(train_loader), total=len(train_loader)):
+            for i, (pixels, _) in tqdm(enumerate(train_loader), total=len(train_loader)):
                 pixels = pixels.to(device)
 
                 # Forward pass
@@ -88,15 +88,16 @@ def train_stacked_autoencoder(data, train_gt, val_gt, cfg):
             if cfg.val_split > 0:
                 print(f'STARTING VALIDATION {epoch + 1}/{cfg.sae_num_epochs[layer]}')
                 model.eval()
-                error = test_sae_model(model, val_loader)
+                report = test_sae_model(model, val_loader, data.num_classes + 1)
                 model.train()
 
-                if best_error > error:
-                    best_error = error
+                loss = report['avg_loss']
+                if best_error > loss:
+                    best_error = loss
                     best_layer = (model.encoders[layer].state_dict(), model.decoders[layer].state_dict())
 
         # Set the layer values to the best result during training
-        print(f'FINISHED TRAINING LAYER {layer + 1}/{total_layers}, LOADING BEST VALUES (ERROR: {best_error}).')
+        print(f'FINISHED TRAINING LAYER {layer + 1}/{total_layers}, LOADING BEST VALUES (ERROR: {best_error:.5f}).')
         model.encoders[layer].load_state_dict(best_layer[0])
         model.decoders[layer].load_state_dict(best_layer[1])
 
