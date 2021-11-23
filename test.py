@@ -55,6 +55,7 @@ def test():
     for run in range(cfg.num_runs):
         print(f'TESTING STACKED AUTOENCODER FROM RUN {run + 1}/{cfg.num_runs}')
         _, test_gt, _ = HSIData.load_samples(cfg.split_folder, cfg.train_split, cfg.val_split, run)
+        num_classes = len(np.unique(test_gt)) - 1
 
         test_dataset = SAEDataset(data, test_gt)
         test_loader = DataLoader(test_dataset, batch_size=cfg.test_batch_size, shuffle=False)
@@ -65,19 +66,27 @@ def test():
         sae.state_dict(torch.load(sae_file))
         sae.eval()
 
-        sae_loss = test_sae_model(sae, test_loader)
+        sae_report = test_sae_model(sae, test_loader, num_classes)
 
+        # TODO: Either solve this or leave the option below
         # Apply dimension reduction to image
-        sae_data = sae(torch.from_numpy(data))
-        sae_data = sae_data.detach().numpy()
+        sae_data_cal = sae(torch.from_numpy(data))
+        sae_data_cal = sae_data_cal.detach().numpy()
+
+        # TODO: Added for debug
+        sae_data = torch.load(cfg.exec_folder + 'sae_image.pth')
+
+        # TODO: Added for debug
+        diff = sae_data_cal - sae_data
+
+        # Remove undefined class from ground truth
+        test_gt = HSIData.remove_negative_gt(test_gt)
+        num_classes -= 1
 
         print(f'TESTING SAE-3DDRN MODEL FROM RUN {run + 1}/{cfg.num_runs}')
         # Load test ground truth and initialize test loader
-        test_gt = HSIData.remove_negative_gt(test_gt)
         test_dataset = DRNDataset(sae_data, test_gt, cfg.sample_size, data_augmentation=False)
         test_loader = DataLoader(test_dataset, batch_size=cfg.test_batch_size, shuffle=False)
-
-        num_classes = len(np.unique(test_gt)) - 1
 
         # Load model
         model_file = cfg.exec_folder + f'runs/drn_{test_best}model_run_' + str(run) + '.pth'
@@ -91,7 +100,7 @@ def test():
         # Test model from the current run
         report = test_model(model, test_loader, writer)
         filename = cfg.results_folder + 'test.txt'
-        save_results(filename, report, sae_loss, run)
+        save_results(filename, report, sae_report, run)
 
     if cfg.use_tensorboard:
         writer.close()
@@ -99,21 +108,35 @@ def test():
 
 # TODO: Test autoencoder per class
 # Test stacked autoencoder
-def test_sae_model(model, loader):
+def test_sae_model(model, loader, num_classes):
     total_loss = 0.0
+    per_class_loss = np.array([0.0] * num_classes)
+    counter = np.array([0] * num_classes, dtype=int)
     model.test(True)
     with torch.no_grad():
-        for i, pixels in tqdm(enumerate(loader), total=len(loader)):
+        for pixels, labels in tqdm(loader, total=len(loader)):
             pixels = pixels.to(device)
             outputs = model(pixels)
 
-            total_loss += f.mse_loss(outputs, pixels)
+            for i, label in enumerate(labels):
+                label = label.item()
+                per_class_loss[label] += f.mse_loss(outputs[i], pixels[i])
+                total_loss += f.mse_loss(outputs[i], pixels[i])
+                counter[label] += 1
     model.test(False)
 
-    avg_loss = total_loss / len(loader)
-    print(f'- Average loss: {avg_loss:5f}')
+    avg_loss = total_loss / np.sum(counter)
+    per_class_loss = per_class_loss / counter
 
-    return avg_loss
+    print(f'- Average loss: {avg_loss:.5f}')
+    print(f'- Per class loss: {per_class_loss}')
+
+    report = {
+        'avg_loss': avg_loss,
+        'per_class_loss': per_class_loss
+    }
+
+    return report
 
 
 # Function for performing the tests for a given model and data loader
