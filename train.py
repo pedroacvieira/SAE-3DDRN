@@ -13,11 +13,11 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from utils.config import SAE3DConfig
-from utils.dataset import SAEDataset, DRNDataset
+from utils.dataset import DRNDataset
 from utils.tools import *
 from net.sae import SAE
 from net.drn import DRN
-from train_stacked_autoencoder import train_stacked_autoencoder
+from sae_train import train_stacked_autoencoder
 from test import test_model
 
 # Import tensorboard
