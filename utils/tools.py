@@ -75,7 +75,7 @@ class HSIData:
         image_height, image_width, image_bands = image.shape
         flat_image = np.reshape(image, (image_height * image_width, image_bands))
 
-        # Normalize data. Range [-1, 1]
+        # Normalize data. Range [0, 1]
         sca = MinMaxScaler()
         sca.fit(flat_image)
         norm_img = sca.transform(flat_image)

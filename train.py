@@ -136,7 +136,7 @@ def train():
 
             # Run iterations
             for i, (images, labels) in tqdm(enumerate(train_loader), total=len(train_loader)):
-                # image should have size 23x23x5
+                # image should have size 25x25x10
                 images = images.to(device)
                 labels = labels.to(device)
 
