@@ -66,6 +66,9 @@ def test():
         sae.load_state_dict(torch.load(sae_file))
         sae.eval()
 
+        # Set model to device
+        sae = sae.to(device)
+
         sae_report = test_sae_model(sae, test_loader, num_classes + 1)
 
         sae_data = torch.load(cfg.exec_folder + 'runs/encoded_image_0.pth')
