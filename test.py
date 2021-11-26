@@ -71,7 +71,7 @@ def test():
 
         sae_report = test_sae_model(sae, test_loader, num_classes + 1)
 
-        sae_data = torch.load(cfg.exec_folder + 'runs/encoded_image_0.pth')
+        sae_data = torch.load(cfg.exec_folder + f'runs/encoded_image_{run}.pth')
 
         # Remove undefined class from ground truth
         test_gt = HSIData.remove_negative_gt(test_gt)
