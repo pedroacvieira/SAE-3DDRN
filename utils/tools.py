@@ -141,8 +141,8 @@ class HSIData:
 
     # Save information needed for testing
     @staticmethod
-    def save_sae_data(exec_folder, sae_image):
-        torch.save(sae_image, exec_folder + 'sae_image.pth')
+    def save_sae_data(filename, sae_image):
+        torch.save(sae_image, filename)
 
     # Load samples from hard drive for every run.
     @staticmethod
