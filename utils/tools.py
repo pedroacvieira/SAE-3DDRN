@@ -10,7 +10,7 @@ Created on Tue Nov 09 17:50 2021
 import torch
 import numpy as np
 from scipy import io
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import random
 import os
 import glob
@@ -71,14 +71,22 @@ class HSIData:
         self.image = self.normalize(np.asarray(img, dtype='float32'))
 
     @staticmethod
-    def normalize(image):
+    def normalize(image, normalization='minmax'):
         image_height, image_width, image_bands = image.shape
         flat_image = np.reshape(image, (image_height * image_width, image_bands))
 
-        # Normalize data. Range [0, 1]
-        sca = MinMaxScaler()
-        sca.fit(flat_image)
-        norm_img = sca.transform(flat_image)
+        if normalization is 'minmax':
+            # Normalize data. Range [0, 1]
+            sca = MinMaxScaler()
+            sca.fit(flat_image)
+            norm_img = sca.transform(flat_image)
+        elif normalization is 'standard':
+            # Normalize to unit variance and zero mean
+            sca = StandardScaler()
+            sca.fit(flat_image)
+            norm_img = sca.transform(flat_image)
+        else:
+            raise Exception('Normalization type not implemented!')
 
         out_img = np.reshape(norm_img, (image_height, image_width, image_bands))
         return out_img

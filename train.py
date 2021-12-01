@@ -85,7 +85,7 @@ def train():
         # Apply dimension reduction to image
         sae_image = sae(torch.from_numpy(data.image))
         sae_image = sae_image.detach().numpy()
-        sae_image = HSIData.normalize(sae_image)
+        sae_image = HSIData.normalize(sae_image, normalization='standard')
         HSIData.save_sae_data(cfg.exec_folder + f'runs/encoded_image_{run}.pth', sae_image)
 
         # Remove negative numbers in the ground truth after the SAE has been trained
