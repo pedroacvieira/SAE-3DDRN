@@ -8,6 +8,7 @@ import numpy as np
 # Set file #
 ############
 PATH = '../../../Results/'
+EXPERIMENT = 'full/'
 FILE = 'test_paviau_dffn.txt'
 DATASETS = ['paviau', 'indian_pines', 'salinas']
 NETWORKS = ['sdmm', 'dffn', 'vscnn', 'sae3ddrn']
@@ -54,7 +55,7 @@ def main():
     for data in DATASETS:
         for net in NETWORKS:
             file = 'test_' + data + '_' + net + '.txt'
-            filename = PATH + file
+            filename = PATH + EXPERIMENT + file
             oa, aa, kappa, a_max, a_min = get_values(filename)
 
             print(f'TEST: {net} with {data}')
