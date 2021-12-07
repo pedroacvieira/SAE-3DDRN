@@ -47,7 +47,7 @@ def get_values(filename):
     oa = np.array(overall_accuracy)
     aa = np.array(average_accuracy)
     kappa = np.array(kappa_coefficients)
-    return oa.mean(), aa.mean(), kappa.mean(), np.max(oa), np.min(oa)
+    return oa, aa, kappa
 
 
 # Main for running test independently
@@ -56,16 +56,20 @@ def main():
         for net in NETWORKS:
             file = 'test_' + data + '_' + net + '.txt'
             filename = PATH + EXPERIMENT + file
-            oa, aa, kappa, a_max, a_min = get_values(filename)
+            oa, aa, kappa = get_values(filename)
+
+            oa_mean = oa.mean()
+            aa_mean = aa.mean()
+            kp_mean = kappa.mean()
 
             print(f'TEST: {net} with {data}')
             print('#' * 15)
-            print(f'OA: {oa:.6f}')
-            print(f'AA: {aa:.6f}')
-            print(f'Kappa: {kappa:.6f}')
+            print(f'OA: {oa.mean():.6f} (+- {oa.std():.6f})')
+            print(f'AA: {aa.mean():.6f} (+- {aa.std():.6f})')
+            print(f'Kappa: {kappa.mean():.6f} (+- {kappa.std():.6f})')
             print('-' * 15)
-            print(f'Max OA: {a_max:.5f}')
-            print(f'Min OA: {a_min:.5f}')
+            print(f'Max OA: {np.max(oa):.5f}')
+            print(f'Min OA: {np.min(oa):.5f}')
             print('')
 
 
