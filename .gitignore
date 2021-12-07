@@ -7,3 +7,4 @@ datasets/*
 dataset_split/*
 tensorboard/*
 .fuse*
+*.out
