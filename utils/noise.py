@@ -26,7 +26,7 @@ def add_noise(img, noise_amount, noise_type='salt_and_pepper'):
 
     if noise_type is 'salt_and_pepper':
         # Calculate the number of image salt and pepper noise points
-        num_points = int(pixels_per_band * (1 - noise_amount))
+        num_points = int(pixels_per_band * noise_amount)
 
         for band in range(img.shape[2]):
             for i in range(num_points):
@@ -37,6 +37,8 @@ def add_noise(img, noise_amount, noise_type='salt_and_pepper'):
                     out[rand_x, rand_y, band] = 0
                 else:
                     out[rand_x, rand_y, band] = 1
+    elif noise_type is 'gaussian':
+        print('Implement it')
     else:
         raise Exception('noise type not implemented')
 
