@@ -39,7 +39,7 @@ def add_noise(img, noise_param, noise_type='salt_and_pepper'):
                 out[rand_x, rand_y, band] = 0 if np.random.random() <= 0.5 else MAX
 
     # Applies an additive gaussian noise to every pixel with mean and variance defined by noise_param
-    # noise_param = [mu, sigma]
+    # noise_param = sigma; normal = [mu, sigma]
     elif noise_type is 'additive_gaussian':
         for idx, element in np.ndenumerate(out):
             noise = np.random.normal(0.0, noise_param)
@@ -52,7 +52,7 @@ def add_noise(img, noise_param, noise_type='salt_and_pepper'):
             noise = np.random.normal(1.0, noise_param)
             out[idx] = np.min(MAX, element + noise)
     else:
-        raise Exception('noise type not implemented')
+        raise Exception('Noise type not implemented')
 
     return out
 
