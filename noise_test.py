@@ -69,6 +69,7 @@ def test():
             noisy_data = add_noise(data, noise[1], noise[0])
             sae_noisy_data = sae(torch.from_numpy(noisy_data))
             sae_noisy_data = sae_noisy_data.detach().numpy()
+            sae_noisy_data = HSIData.normalize(sae_noisy_data, normalization='standard')
 
             # Load test ground truth and initialize test loader
             test_dataset = DRNDataset(sae_noisy_data, test_gt, cfg.sample_size, data_augmentation=False)
