@@ -29,7 +29,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # SET TEST CONFIG FILE #
 ########################
 CONFIG_FILE = ''  # Empty string to load default 'config.yaml'
-NOISES = [['salt_and_pepper', 0.1], ['additive_gaussian', 0.0025], ['multiplicative_gaussian', 0.01]]
+NOISES = [['salt_and_pepper', 0.05], ['additive_gaussian', 0.0025], ['multiplicative_gaussian', 0.01]]
 
 
 # Test SAE-3DDRN runs
@@ -85,7 +85,7 @@ def test():
 
             # Test model from the current run
             report = test_model(model, test_loader, writer)
-            filename = cfg.results_folder + f'test_{noise_type}.txt'
+            filename = cfg.results_folder + f'test_{noise[0]}.txt'
             save_results(filename, report, None, run)
 
     if cfg.use_tensorboard:
