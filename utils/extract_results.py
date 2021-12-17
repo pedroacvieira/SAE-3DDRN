@@ -6,15 +6,16 @@ import numpy as np
 ############
 # Set file #
 ############
-PATH = '../../../Results/'
-EXPERIMENT = 'full/'
+PATH = '../../../Results/svm/'
+EXPERIMENT = ''
 FILE = 'test_paviau_dffn.txt'
-# DATASETS = ['paviau', 'indian_pines', 'salinas']  # Use this for all datasets
-DATASETS = ['paviau']
+DATASETS = ['paviau', 'salinas', 'indian_pines']  # Use this for all datasets
 NETWORKS = ['sdmm', 'dffn', 'vscnn', 'sae3ddrn']
 
+
 VALUE_POSITION = 3
-NUM_RUNS = 10
+NUM_RUNS = 20
+PRINT_MAX_MIN_ACCURACY = False
 PRINT_PER_CLASS_ACCURACY = True
 
 
@@ -75,15 +76,19 @@ def main():
 
             print(f'TEST: {net} with {data}')
             print('#' * 15)
-            print(f'OA: {oa.mean():.6f} ({oa.std():.6f})')
-            print(f'AA: {aa.mean():.6f} ({aa.std():.6f})')
-            print(f'Kappa: {kappa.mean():.6f} ({kappa.std():.6f})')
-            print('-' * 15)
-            print(f'Max OA: {np.max(oa):.5f}')
-            print(f'Min OA: {np.min(oa):.5f}')
-            if PRINT_PER_CLASS_ACCURACY:
+            print(f'OA: {oa.mean()*100:.2f} $\\pm$ {oa.std()*100:.2f}')
+            print(f'AA: {aa.mean()*100:.2f} $\\pm$ {aa.std()*100:.2f}')
+            print(f'Kappa: {kappa.mean()*100:.2f} $\\pm$ {kappa.std()*100:.2f}')
+            if PRINT_MAX_MIN_ACCURACY:
                 print('-' * 15)
-                print(f'Per Class Accuracy: {np.mean(class_acc, axis=0)}')
+                print(f'Max OA: {np.max(oa)*100:.2f}')
+                print(f'Min OA: {np.min(oa)*100:.2f}')
+            if PRINT_PER_CLASS_ACCURACY:
+                rounded_class_acc = [round(x*100, 2) for x in np.mean(class_acc, axis=0)]
+                print('-' * 15)
+                print(f'Per Class Accuracy:')
+                for a in rounded_class_acc:
+                    print(f'{a:.2f}')
             print('')
 
 
