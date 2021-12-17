@@ -29,7 +29,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # SET TEST CONFIG FILE #
 ########################
 CONFIG_FILE = ''  # Empty string to load default 'config.yaml'
-NOISE_TYPES = ['salt_and_pepper', 'additive_gaussian', 'multiplicative_gaussian']
+NOISES = [['salt_and_pepper', 0.1], ['additive_gaussian', 0.0025], ['multiplicative_gaussian', 0.01]]
 
 
 # Test SAE-3DDRN runs
@@ -52,7 +52,8 @@ def test():
     data = torch.load(cfg.exec_folder + 'proc_image.pth')
 
     for run in range(cfg.num_runs):
-        print(f'TESTING STACKED AUTOENCODER FROM RUN {run + 1}/{cfg.num_runs}')
+        print(f'TESTING RUN {run + 1}/{cfg.num_runs}')
+
         _, test_gt, _ = HSIData.load_samples(cfg.split_folder, cfg.train_split, cfg.val_split, run)
         test_gt = HSIData.remove_negative_gt(test_gt)
         num_classes = len(np.unique(test_gt)) - 1
@@ -63,11 +64,12 @@ def test():
         sae.load_state_dict(torch.load(sae_file))
         sae.eval()
 
-        for noise_type in NOISE_TYPES:
-            noisy_data = add_noise(data, noise_type)
-            sae_noisy_data = sae(noisy_data)
+        for noise in NOISES:
+            print(f'- Using {noise[0]} noise')
+            noisy_data = add_noise(data, noise[1], noise[0])
+            sae_noisy_data = sae(torch.from_numpy(noisy_data))
+            sae_noisy_data = sae_noisy_data.detach().numpy()
 
-            print(f'TESTING SAE-3DDRN MODEL FROM RUN {run + 1}/{cfg.num_runs}')
             # Load test ground truth and initialize test loader
             test_dataset = DRNDataset(sae_noisy_data, test_gt, cfg.sample_size, data_augmentation=False)
             test_loader = DataLoader(test_dataset, batch_size=cfg.test_batch_size, shuffle=False)
