@@ -43,14 +43,14 @@ def add_noise(img, noise_param, noise_type='salt_and_pepper'):
     elif noise_type == 'additive_gaussian':
         for idx, element in np.ndenumerate(out):
             noise = np.random.normal(0.0, noise_param)
-            out[idx] = np.min(MAX, element + noise)
+            out[idx] = np.min([MAX, element + noise])
 
     # Applies a multiplicative gaussian noise to every pixel with mean and variance defined by noise_param
     # noise_param = sigma; noise = normal(1.0, noise_param)
     elif noise_type == 'multiplicative_gaussian':
         for idx, element in np.ndenumerate(out):
             noise = np.random.normal(1.0, noise_param)
-            out[idx] = np.min(MAX, element + noise)
+            out[idx] = np.min([MAX, element + noise])
     else:
         raise Exception('Noise type not implemented')
 
