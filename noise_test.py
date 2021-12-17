@@ -9,19 +9,15 @@ Created on Tue Dec 17 15:33 2021
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as f
 from torch.utils.data import DataLoader
-import numpy as np
-from sklearn import metrics
-from tqdm import tqdm
 
+from net.drn import DRN
+from net.sae import SAE
+from test import test_model
 from utils.config import SAE3DConfig
 from utils.dataset import DRNDataset
-from utils.tools import *
-from net.sae import SAE
-from net.drn import DRN
 from utils.noise import add_noise
-from test import test_model
+from utils.tools import *
 
 # Import tensorboard
 from torch.utils.tensorboard import SummaryWriter
