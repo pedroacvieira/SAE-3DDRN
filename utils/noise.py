@@ -27,9 +27,9 @@ def add_noise(img, noise_param, noise_type='salt_and_pepper'):
 
     # Applies a salt and pepper noise to each band for a noise_param ratio of the pixels
     # noise_param = fraction of noisy pixels [0.1)
-    if noise_type is 'salt_and_pepper':
+    if noise_type == 'salt_and_pepper':
         # Calculate the number of image salt and pepper noise points
-        num_points = np.floor(pixels_per_band * noise_param)
+        num_points = int(np.floor(pixels_per_band * noise_param))
 
         for band in range(img.shape[2]):
             for i in range(num_points):
@@ -40,14 +40,14 @@ def add_noise(img, noise_param, noise_type='salt_and_pepper'):
 
     # Applies an additive gaussian noise to every pixel with mean and variance defined by noise_param
     # noise_param = sigma; normal = [mu, sigma]
-    elif noise_type is 'additive_gaussian':
+    elif noise_type == 'additive_gaussian':
         for idx, element in np.ndenumerate(out):
             noise = np.random.normal(0.0, noise_param)
             out[idx] = np.min(MAX, element + noise)
 
     # Applies a multiplicative gaussian noise to every pixel with mean and variance defined by noise_param
     # noise_param = sigma; noise = normal(1.0, noise_param)
-    elif noise_type is 'multiplicative_gaussian':
+    elif noise_type == 'multiplicative_gaussian':
         for idx, element in np.ndenumerate(out):
             noise = np.random.normal(1.0, noise_param)
             out[idx] = np.min(MAX, element + noise)
