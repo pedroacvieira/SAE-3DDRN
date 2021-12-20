@@ -29,7 +29,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # SET TEST CONFIG FILE #
 ########################
 CONFIG_FILE = 'experiments/server_02/config.yaml'  # Empty string to load default 'config.yaml'
-NOISES = [['salt_and_pepper', 0.05], ['additive_gaussian', 0.0025], ['multiplicative_gaussian', 0.01]]
+NOISES = [['salt_and_pepper', 0.05], ['salt_and_pepper', 0.1], ['salt_and_pepper', 0.2], ['salt_and_pepper', 0.3], ['salt_and_pepper', 0.4]]
 
 
 # Test SAE-3DDRN runs
@@ -65,9 +65,9 @@ def test():
         sae.eval()
 
         for noise in NOISES:
-            print(f'Using {noise[0]} noise')
+            print(f'Using {noise[0]} noise with parameter: {noise[1]}')
             noisy_data = add_noise(data, noise)
-            sae_noisy_data = sae(torch.from_numpy(data))
+            sae_noisy_data = sae(torch.from_numpy(noisy_data))
             sae_noisy_data = sae_noisy_data.detach().numpy()
             sae_noisy_data = HSIData.normalize(sae_noisy_data, normalization='minmax')
 
