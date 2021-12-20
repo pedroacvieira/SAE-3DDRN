@@ -29,6 +29,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # SET TEST CONFIG FILE #
 ########################
 CONFIG_FILE = 'experiments/server_02/config.yaml'  # Empty string to load default 'config.yaml'
+NORMALIZATION = 'minmax'  # minmax; standard
 NOISES = [['salt_and_pepper', 0], ['salt_and_pepper', 0.005], ['salt_and_pepper', 0.01], ['salt_and_pepper', 0.05],
           ['additive_gaussian', 0.0], ['additive_gaussian', 0.05], ['additive_gaussian', 0.1],
           ['additive_gaussian', 0.2], ['additive_gaussian', 0.3],
@@ -73,7 +74,7 @@ def test():
             noisy_data = add_noise(data, noise)
             sae_noisy_data = sae(torch.from_numpy(noisy_data))
             sae_noisy_data = sae_noisy_data.detach().numpy()
-            sae_noisy_data = HSIData.normalize(sae_noisy_data, normalization='minmax')
+            sae_noisy_data = HSIData.normalize(sae_noisy_data, normalization=NORMALIZATION)
 
             # Load test ground truth and initialize test loader
             test_dataset = DRNDataset(sae_noisy_data, test_gt, cfg.sample_size, data_augmentation=False)
