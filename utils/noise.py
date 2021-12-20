@@ -9,7 +9,6 @@ Created on Tue Dec 7 13:31 2021
 
 import torch
 import numpy as np
-import cv2 as cv
 
 # Set image file path
 PATH = '../experiments/prototype/'
@@ -73,7 +72,7 @@ def add_noise(img, noise_params):
 def main():
     img = torch.load(PATH + IMAGE_NAME)
 
-    noisy_img = add_noise(img, [NOISE_TYPE, SIGNAL_NOISE_RATIO])
+    noisy_img = add_noise(img, [NOISE_TYPE, NOISE_AMOUNT])
     torch.save(noisy_img, PATH + 'img_noise_' + NOISE_TYPE + '.pth')
 
 
