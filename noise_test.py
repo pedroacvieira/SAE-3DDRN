@@ -6,7 +6,7 @@ Created on Tue Dec 17 15:33 2021
 @author: Pedro Vieira
 @description: Implements the test function for the SAE-3DDRN network adding noise to the input image
 """
-
+import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -28,7 +28,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 ########################
 # SET TEST CONFIG FILE #
 ########################
-CONFIG_FILE = ''  # Empty string to load default 'config.yaml'
+CONFIG_FILE = 'experiments/server_02/config.yaml'  # Empty string to load default 'config.yaml'
 NOISES = [['salt_and_pepper', 0.05], ['additive_gaussian', 0.0025], ['multiplicative_gaussian', 0.01]]
 
 
@@ -61,15 +61,15 @@ def test():
         # Load autoencoder model
         sae_file = cfg.exec_folder + f'runs/sae_model_run_' + str(run) + '.pth'
         sae = SAE(data.shape[2], cfg.sae_hidden_layers)
-        sae.load_state_dict(torch.load(sae_file))
+        sae.load_state_dict(torch.load(sae_file, map_location=device))
         sae.eval()
 
         for noise in NOISES:
-            print(f'- Using {noise[0]} noise')
-            noisy_data = add_noise(data, noise[1], noise[0])
-            sae_noisy_data = sae(torch.from_numpy(noisy_data))
+            print(f'Using {noise[0]} noise')
+            noisy_data = add_noise(data, noise)
+            sae_noisy_data = sae(torch.from_numpy(data))
             sae_noisy_data = sae_noisy_data.detach().numpy()
-            sae_noisy_data = HSIData.normalize(sae_noisy_data, normalization='standard')
+            sae_noisy_data = HSIData.normalize(sae_noisy_data, normalization='minmax')
 
             # Load test ground truth and initialize test loader
             test_dataset = DRNDataset(sae_noisy_data, test_gt, cfg.sample_size, data_augmentation=False)
@@ -78,7 +78,7 @@ def test():
             # Load model
             model_file = cfg.exec_folder + f'runs/drn_{test_best}model_run_' + str(run) + '.pth'
             model = nn.DataParallel(DRN(num_classes))
-            model.load_state_dict(torch.load(model_file))
+            model.load_state_dict(torch.load(model_file, map_location=device))
             model.eval()
 
             # Set model to device
