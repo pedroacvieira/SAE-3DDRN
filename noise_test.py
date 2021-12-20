@@ -29,7 +29,11 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # SET TEST CONFIG FILE #
 ########################
 CONFIG_FILE = 'experiments/server_02/config.yaml'  # Empty string to load default 'config.yaml'
-NOISES = [['salt_and_pepper', 0.05], ['salt_and_pepper', 0.1], ['salt_and_pepper', 0.2], ['salt_and_pepper', 0.3], ['salt_and_pepper', 0.4]]
+NOISES = [['salt_and_pepper', 0], ['salt_and_pepper', 0.005], ['salt_and_pepper', 0.01], ['salt_and_pepper', 0.05],
+          ['additive_gaussian', 0.0], ['additive_gaussian', 0.05], ['additive_gaussian', 0.1],
+          ['additive_gaussian', 0.2], ['additive_gaussian', 0.3],
+          ['multiplicative_gaussian', 0], ['multiplicative_gaussian', 0.1], ['multiplicative_gaussian', 0.3],
+          ['multiplicative_gaussian', 0.5], ['multiplicative_gaussian', 0.7]]
 
 
 # Test SAE-3DDRN runs
