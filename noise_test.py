@@ -28,8 +28,9 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 ########################
 # SET TEST CONFIG FILE #
 ########################
-CONFIG_FILE = 'experiments/server_02/config.yaml'  # Empty string to load default 'config.yaml'
-NORMALIZATION = 'minmax'  # minmax; standard
+PATH = 'experiments/'
+EXPERIMENTS = ['server_02']
+
 NOISES = [['salt_and_pepper', 0], ['salt_and_pepper', 0.005], ['salt_and_pepper', 0.01], ['salt_and_pepper', 0.05],
           ['additive_gaussian', 0.0], ['additive_gaussian', 0.05], ['additive_gaussian', 0.1],
           ['additive_gaussian', 0.2], ['additive_gaussian', 0.3],
@@ -38,9 +39,7 @@ NOISES = [['salt_and_pepper', 0], ['salt_and_pepper', 0.005], ['salt_and_pepper'
 
 
 # Test SAE-3DDRN runs
-def test():
-    # Load config data from training
-    config_file = 'config.yaml' if not CONFIG_FILE else CONFIG_FILE
+def test(config_file):
     cfg = SAE3DConfig(config_file, test=True)
 
     # Start tensorboard
@@ -59,6 +58,15 @@ def test():
     for run in range(cfg.num_runs):
         print(f'TESTING RUN {run + 1}/{cfg.num_runs}')
 
+        # Get normalization type
+        sae_data = torch.load(cfg.exec_folder + f'runs/encoded_image_{run}.pth')
+        if np.max(sae_data) == 1.0:
+            normalization = 'minmax'
+        elif np.abs(np.mean(sae_data)) < 1e-5:
+            normalization = 'standard'
+        else:
+            raise ValueError(f'Data normalization not found. Mean: {np.mean(sae_data)}. Max: {np.max(sae_data)}')
+
         _, test_gt, _ = HSIData.load_samples(cfg.split_folder, cfg.train_split, cfg.val_split, run)
         test_gt = HSIData.remove_negative_gt(test_gt)
         num_classes = len(np.unique(test_gt)) - 1
@@ -74,7 +82,7 @@ def test():
             noisy_data = add_noise(data, noise)
             sae_noisy_data = sae(torch.from_numpy(noisy_data))
             sae_noisy_data = sae_noisy_data.detach().numpy()
-            sae_noisy_data = HSIData.normalize(sae_noisy_data, normalization=NORMALIZATION)
+            sae_noisy_data, _ = HSIData.normalize(sae_noisy_data, normalization=normalization)
 
             # Load test ground truth and initialize test loader
             test_dataset = DRNDataset(sae_noisy_data, test_gt, cfg.sample_size, data_augmentation=False)
@@ -91,16 +99,16 @@ def test():
 
             # Test model from the current run
             report = test_model(model, test_loader, writer)
-            filename = cfg.results_folder + f'test_{noise[0]}.txt'
-            save_results(filename, report, None, run)
-
-    if cfg.use_tensorboard:
-        writer.close()
+            save_noise_results(cfg.results_folder, noise, report)
 
 
 # Main for running test independently
 def main():
-    test()
+    # Load config data from training
+    for experiment in EXPERIMENTS:
+        config_file = PATH + experiment + '/config.yaml'
+
+        test(config_file)
 
 
 if __name__ == '__main__':
