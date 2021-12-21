@@ -19,9 +19,6 @@ from utils.dataset import DRNDataset
 from utils.noise import add_noise
 from utils.tools import *
 
-# Import tensorboard
-from torch.utils.tensorboard import SummaryWriter
-
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -41,11 +38,6 @@ NOISES = [['salt_and_pepper', 0], ['salt_and_pepper', 0.005], ['salt_and_pepper'
 # Test SAE-3DDRN runs
 def test(config_file):
     cfg = SAE3DConfig(config_file, test=True)
-
-    # Start tensorboard
-    writer = None
-    if cfg.use_tensorboard:
-        writer = SummaryWriter(cfg.tensorboard_folder)
 
     # Set string modifier if testing best models
     test_best = 'best_' if cfg.test_best_models else ''
@@ -98,7 +90,7 @@ def test(config_file):
             model = model.to(device)
 
             # Test model from the current run
-            report = test_model(model, test_loader, writer)
+            report = test_model(model, test_loader)
             save_noise_results(cfg.results_folder, noise, report)
 
 
