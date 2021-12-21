@@ -249,6 +249,7 @@ def save_noise_results(path, noise, report):
         file.write(f'\n- OVERALL ACCURACY: {report["overall_accuracy"]:f}\n')
         file.write(f'\n- AVERAGE ACCURACY: {report["average_accuracy"]:f}\n')
         file.write(f'\n- KAPPA COEFFICIENT: {report["kappa"]:f}\n')
+        file.write('\n\n')
 
     torch_filename = f'{path}noise_{noise_type}_{noise_amount}.pth'
     torch.save(report, torch_filename)
