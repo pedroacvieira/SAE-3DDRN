@@ -68,27 +68,37 @@ class HSIData:
         self.ignored_labels = list(set(ignored_labels))
         self.num_classes = len(self.label_values) - len(self.ignored_labels)
 
-        self.image = self.normalize(np.asarray(img, dtype='float32'))
+        self.image, _ = self.normalize(np.asarray(img, dtype='float32'))
 
+    # Normalize data and return normalization object to enable using its inverse later on
     @staticmethod
     def normalize(image, normalization='minmax'):
         image_height, image_width, image_bands = image.shape
         flat_image = np.reshape(image, (image_height * image_width, image_bands))
 
-        if normalization is 'minmax':
-            # Normalize data. Range [0, 1]
+        if normalization == 'minmax':
             sca = MinMaxScaler()
             sca.fit(flat_image)
-            norm_img = sca.transform(flat_image)
-        elif normalization is 'standard':
-            # Normalize to unit variance and zero mean
+        elif normalization == 'standard':
             sca = StandardScaler()
             sca.fit(flat_image)
-            norm_img = sca.transform(flat_image)
         else:
-            raise Exception('Normalization type not implemented!')
+            raise ValueError(f'{normalization} normalization not implemented.')
 
+        norm_img = sca.transform(flat_image)
         out_img = np.reshape(norm_img, (image_height, image_width, image_bands))
+
+        return out_img, sca
+
+    # Undo normalization with normalization object from the normalize function
+    @staticmethod
+    def denormalize(image, scaler):
+        image_height, image_width, image_bands = image.shape
+        flat_image = np.reshape(image, (image_height * image_width, image_bands))
+
+        denorm_img = scaler.inverse_transform(flat_image)
+        out_img = np.reshape(denorm_img, (image_height, image_width, image_bands))
+
         return out_img
 
     # Split ground-truth pixels into train, test, val
@@ -175,7 +185,7 @@ class HSIData:
 
 # Load a checkpoint
 def load_checkpoint(checkpoint_folder, file):
-    # Check whether to load latest checkpoint
+    # Check whether to load the latest checkpoint
     filename = checkpoint_folder + str(file)
     if file is None:
         file_type = '*.pth'
@@ -227,3 +237,18 @@ def save_results(filename, report, sae_report, run, epoch=-1, validation=False):
         file.write('\n')
         file.write('#' * 70)
         file.write('\n\n')
+
+
+def save_noise_results(path, noise, report):
+    noise_type = noise[0]
+    noise_amount = noise[1]
+    filename = f'{path}noise_{noise_type}.nst'
+
+    with open(filename, 'a') as file:
+        file.write(f'Results for amount: {noise_amount}\n')
+        file.write(f'\n- OVERALL ACCURACY: {report["overall_accuracy"]:f}\n')
+        file.write(f'\n- AVERAGE ACCURACY: {report["average_accuracy"]:f}\n')
+        file.write(f'\n- KAPPA COEFFICIENT: {report["kappa"]:f}\n')
+
+    torch_filename = f'{path}noise_{noise_type}_{noise_amount}.pth'
+    torch.save(report, torch_filename)
