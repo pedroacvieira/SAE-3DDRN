@@ -251,5 +251,8 @@ def save_noise_results(path, noise, report):
         file.write(f'\n- KAPPA COEFFICIENT: {report["kappa"]:f}\n')
         file.write('\n\n')
 
-    torch_filename = f'{path}noise_{noise_type}_{noise_amount}.pth'
+    if not os.path.isdir(path + 'torch/'):
+        os.makedirs(path + 'torch/')
+
+    torch_filename = f'{path}torch/noise_{noise_type}_{noise_amount}.pth'
     torch.save(report, torch_filename)
