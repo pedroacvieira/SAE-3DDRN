@@ -10,6 +10,8 @@ Created on Tue Dec 7 13:31 2021
 import torch
 import numpy as np
 
+from utils.tools import HSIData
+
 # Set image file path
 PATH = '../experiments/prototype/'
 IMAGE_NAME = 'proc_image.pth'
@@ -25,15 +27,18 @@ def add_noise(img, noise_params):
     if noise_amount == 0:
         return img
 
-    max_value = np.max(img)
-
+    # Set out data to 0 mean and 1 variance to apply noise, then undo normalization
     out = np.copy(img)
-    pixels_per_band = img.shape[0] * img.shape[1]
+    out, scaler = HSIData.normalize(out, 'standard')
+
+    max_value = np.max(out)
+    min_value = np.min(out)
 
     # Applies a salt and pepper noise to each band for a noise_param ratio of the pixels
     # noise_param = fraction of noisy pixels [0.1)
     if noise_type == 'salt_and_pepper':
         # Calculate the number of image salt and pepper noise points
+        pixels_per_band = img.shape[0] * img.shape[1]
         num_points = int(np.floor(pixels_per_band * noise_amount))
 
         for band in range(img.shape[2]):
@@ -41,7 +46,7 @@ def add_noise(img, noise_params):
                 rand_x = np.random.randint(img.shape[0])  # Generate random x coordinate
                 rand_y = np.random.randint(img.shape[1])  # Generate random y coordinate
 
-                out[rand_x, rand_y, band] = 0 if np.random.random() <= 0.5 else max_value
+                out[rand_x, rand_y, band] = min_value if np.random.random() <= 0.5 else max_value
 
     # Applies an additive gaussian noise to every pixel with mean and variance defined by noise_param
     # noise_param = sigma; normal = [mu, sigma]
@@ -62,8 +67,10 @@ def add_noise(img, noise_params):
     # Prune out of bounds values
     out_of_bounds_max = np.nonzero(out > max_value)
     out[out_of_bounds_max] = max_value
-    out_of_bounds_min = np.nonzero(out < 0)
-    out[out_of_bounds_min] = 0
+    out_of_bounds_min = np.nonzero(out < min_value)
+    out[out_of_bounds_min] = min_value
+
+    out = HSIData.denormalize(out, scaler)
 
     return out
 
