@@ -52,12 +52,13 @@ def test(config_file):
 
         # Get normalization type
         sae_data = torch.load(cfg.exec_folder + f'runs/encoded_image_{run}.pth')
-        if np.max(sae_data) == 1.0:
+        if np.abs(1.0 - np.max(sae_data)) < 1e-5:
             normalization = 'minmax'
         elif np.abs(np.mean(sae_data)) < 1e-5:
             normalization = 'standard'
         else:
             raise ValueError(f'Data normalization not found. Mean: {np.mean(sae_data)}. Max: {np.max(sae_data)}')
+        print(f'Normalization: {normalization}')
 
         _, test_gt, _ = HSIData.load_samples(cfg.split_folder, cfg.train_split, cfg.val_split, run)
         test_gt = HSIData.remove_negative_gt(test_gt)
