@@ -26,7 +26,11 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # SET TEST CONFIG FILE #
 ########################
 PATH = 'experiments/'
-EXPERIMENTS = ['server_02']
+EXPERIMENTS = ['server_02', 'server_salinas_03', 'server_indian_pines_02',
+               'reduced_01_server_paviau_01', 'reduced_01_server_salinas_01', 'reduced_01_server_indian_pines_01',
+               'reduced_05_server_paviau_02', 'reduced_05_server_salinas_01', 'reduced_05_server_indian_pines_01',
+               'reduced_10_server_paviau_01', 'reduced_10_server_salinas_01', 'reduced_10_server_indian_pines_01']
+
 
 NOISES = [['salt_and_pepper', 0], ['salt_and_pepper', 0.001], ['salt_and_pepper', 0.005], ['salt_and_pepper', 0.01],
           ['salt_and_pepper', 0.05],
