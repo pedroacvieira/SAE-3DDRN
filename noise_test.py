@@ -81,7 +81,7 @@ def test(config_file):
         for noise in NOISES:
             print(f'Using {noise[0]} noise with parameter: {noise[1]}')
             noisy_data = add_noise(data, noise)
-            sae_noisy_data = sae(torch.from_numpy(noisy_data))
+            sae_noisy_data = sae(torch.Tensor(noisy_data))
             sae_noisy_data = sae_noisy_data.detach().numpy()
             sae_noisy_data, _ = HSIData.normalize(sae_noisy_data, normalization=normalization)
 
