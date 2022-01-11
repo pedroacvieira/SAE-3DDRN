@@ -39,23 +39,24 @@ class DRN(nn.Module):
 
     def __init__(self, num_classes, drop_out=0.4):
         super(DRN, self).__init__()
+        # Input size = [1, 10, 25, 25]
         self.relu = nn.ReLU()
 
-        self.block1 = nn.Sequential(nn.Conv3d(1, 16, (3, 3, 3)),
+        self.block1 = nn.Sequential(nn.Conv3d(1, 16, (3, 3, 3)),  # Size = [16, 8, 23, 23]
                                     nn.BatchNorm3d(16), self.relu,
                                     ResidualBlock(16), self.relu,
-                                    nn.MaxPool3d((1, 2, 2)))
+                                    nn.MaxPool3d((1, 2, 2)))  # Size = [16, 8, 11, 11]
         self.block2 = nn.Sequential(nn.Conv3d(16, 32, (3, 3, 3), padding=1),
                                     nn.BatchNorm3d(32), self.relu,
                                     ResidualBlock(32), self.relu,
-                                    nn.MaxPool3d((1, 2, 2)))
+                                    nn.MaxPool3d((1, 2, 2)))  # Size = [32, 8, 5, 5]
         self.block3 = nn.Sequential(nn.Conv3d(32, 64, (3, 3, 3), padding=1),
                                     nn.BatchNorm3d(64), self.relu,
                                     ResidualBlock(64), self.relu,
                                     nn.MaxPool3d((2, 2, 2)),
-                                    nn.BatchNorm3d(64))  # Output size should be [2, 2, 4, 64]
-        self.classifier = nn.Sequential(nn.Linear(1024, 256), self.relu, nn.Dropout3d(),
-                                        nn.Linear(256, 128), self.relu, nn.Dropout3d(),
+                                    nn.BatchNorm3d(64))  # Output size should be [64, 4, 2, 2]
+        self.classifier = nn.Sequential(nn.Linear(1024, 256), self.relu, nn.Dropout3d(drop_out),
+                                        nn.Linear(256, 128), self.relu, nn.Dropout3d(drop_out),
                                         nn.Linear(128, num_classes))
 
     def forward(self, x):
