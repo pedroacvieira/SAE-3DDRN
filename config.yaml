@@ -1,6 +1,6 @@
 # Dataset settings
 dataset: 'PaviaU'  # PaviaU; IndianPines; Salinas
-experiment: 'prototype_05'  # Name for the experiment (will be used to load all information)
+experiment: 'experiment_01'  # Name for the experiment (will be used to load all information)
 data_folder: './datasets/'  # Dataset folder
 exec_folder: './experiments/'  # Folder where to keep all the experiment data
 split_folder: 'data_split/'  # Where to store dataset splits
@@ -10,11 +10,11 @@ generate_samples: True  # Whether the samples should be generated (False to load
 max_samples: 6000  # max training samples per class (null for no limit)
 
 # Hyper parameters
-train_batch_size: 100  # Batch size for every train iteration
-test_batch_size: 20  # Batch size for every test iteration
+train_batch_size: 128  # Batch size for every train iteration
+test_batch_size: 64  # Batch size for every test iteration
 sample_size: 25  # Window size for every sample/pixel input
-num_runs: 1  # The amount of time the whole experiment should run
-num_epochs: 6  # Number of epochs per run
+num_runs: 10  # The amount of time the whole experiment should run
+num_epochs: 50  # Number of epochs per run
 learning_rate: 0.01  # Initial learning rate
 betas: [0.9, 0.999]  # Betas for Adam optimizer
 weight_decay: 1e-4  # The weight decay for the optimizer
@@ -42,4 +42,4 @@ checkpoint_file: null  # What checkpoint file to load (null for the latest)
 delete_checkpoints: True  # Delete checkpoints after successfully training the network (saves storage)
 print_frequency: 20  # The amount of iterations between every step/loss print
 sae_print_frequency: 20  # The amount of iterations between every step/loss print
-use_tensorboard: False  # Whether to use tensor boar for training information
+use_tensorboard: False  # Whether to use tensor boar for training information (not implemented)
